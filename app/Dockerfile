@@ -50,6 +50,7 @@ COPY docker-config/apache/site.conf /etc/apache2/sites-available/000-default.con
 # Changement de dossier de travail (dossier partagé)
 WORKDIR /var/www/html
 RUN chown www-data /var/www/html/
+RUN chown -R www-data .
 
 # Configuration du serveur web
 RUN a2enmod rewrite
