@@ -28,12 +28,14 @@ class UserRepository extends ServiceEntityRepository
     public function findBySearchQuery($query)
     {
         return $this->createQueryBuilder('u')
-            ->where('u.username LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
-            ->orderBy('u.username', 'ASC')
+            ->select('u.username')
+            ->where('LOWER(u.username) LIKE LOWER(:query)')
+            ->setParameter('query', '%' . strtolower($query) . '%')
+            ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
+
 
 
     //    /**
