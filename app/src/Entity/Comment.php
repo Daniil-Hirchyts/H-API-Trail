@@ -4,32 +4,36 @@ namespace App\Entity;
 
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?string $id = null;
 
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?int $sender = null;
+    #[Assert\NotNull]
+    private ?string $sender = null;
 
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?int $recipient = null;
+    #[Assert\NotNull]
+    private ?string $recipient = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
     private ?string $comment = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
     private ?int $stars = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }

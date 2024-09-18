@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use App\Enum\Role;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\Doctrine\UuidType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -16,9 +18,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class User
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
@@ -74,15 +75,15 @@ class User
     #[Assert\NotNull]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => "CURRENT_TIMESTAMP"])]
     #[Assert\NotNull]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['default' => "CURRENT_TIMESTAMP"])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => "CURRENT_TIMESTAMP"])]
     #[Assert\NotNull]
     private ?\DateTimeInterface $lastLogin = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -171,14 +172,14 @@ class User
         return $this;
     }
 
-    public function getAddresse(): ?string
+    public function getAddress(): ?string
     {
-        return $this->addresse;
+        return $this->address;
     }
 
-    public function setAddresse(?string $addresse): static
+    public function setAddress(?string $address): static
     {
-        $this->addresse = $addresse;
+        $this->address = $address;
 
         return $this;
     }
