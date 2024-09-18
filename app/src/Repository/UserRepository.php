@@ -16,6 +16,26 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function getCardUsernames(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.username')
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function findBySearchQuery($query)
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.username LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('u.username', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

@@ -5,8 +5,12 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use App\Enum\Role;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+#[UniqueEntity('username', message: 'Ce username est déjà utilisé!')]
+#[UniqueEntity('email', message: 'Cette adresse email est déjà utilisée!')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 class User
@@ -17,18 +21,23 @@ class User
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
     private ?string $username = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Assert\NotNull]
     private ?bool $visible = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'text')]
+    #[Assert\NotNull]
     private ?string $hash = null;
 
-    #[ORM\Column(type: 'string', enumType: Role::class)]
+    #[ORM\Column(type: 'string', enumType: Role::class, options: ['default' => Role::USER])]
+    #[Assert\NotNull]
     private Role $role;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -38,7 +47,7 @@ class User
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $addresse = null;
+    private ?string $address = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $country = null;
@@ -55,13 +64,22 @@ class User
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $job = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lastname = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => "CURRENT_TIMESTAMP"])]
+    #[Assert\NotNull]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['default' => "CURRENT_TIMESTAMP"])]
+    #[Assert\NotNull]
     private ?\DateTimeInterface $lastLogin = null;
 
     public function getId(): ?int
@@ -260,4 +278,26 @@ class User
 
         return $this;
     }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getSurname(): ?string
+    {
+        return $this->surname;
+    }
+
+    public function setSurname(?string $surname): void
+    {
+        $this->surname = $surname;
+    }
+
+
 }
