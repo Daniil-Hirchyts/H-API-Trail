@@ -25,15 +25,28 @@ class UserRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
+    public function getAllInformation($userId): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.username, u.email, u.visible, u.name, u.lastname, u.bio, u.phone, u.address, u.country, u.zipCode, u.city, u.website, u.job, u.createdAt, u.updatedAt, u.lastLogin')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+
     public function findBySearchQuery($query)
     {
         return $this->createQueryBuilder('u')
-            ->where('u.username LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
-            ->orderBy('u.username', 'ASC')
+            ->select('u.username')
+            ->where('LOWER(u.username) LIKE LOWER(:query)')
+            ->setParameter('query', '%' . strtolower($query) . '%')
+            ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->getResult();
     }
+
 
 
     //    /**

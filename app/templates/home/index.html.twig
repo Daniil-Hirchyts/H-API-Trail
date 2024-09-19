@@ -1,20 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}{{ tittle }}{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper bg-purple-400">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-<p>{{ feur }}</p>
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/marius/Documents/Cours/SAE BUT3/Annuaire/app/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/Users/marius/Documents/Cours/SAE BUT3/Annuaire/app/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+    <form id="search-form" class="mb-4">
+        <input
+                type="text"
+                id="search-query"
+                name="query"
+                placeholder="Rechercher..."
+                class="border p-2 rounded w-full"
+        />
+        <button
+                type="submit"
+                class="bg-blue-500 text-white p-2 rounded mt-2 w-full">
+            Rechercher
+        </button>
+    </form>
+
+    <div id="results" class="grid grid-cols-3 gap-4">
+        {% for card in cards %}
+            <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-md">
+                <p class="text-center text-lg font-semibold">{{ card.username }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Récupération de la valeur de recherche
+            const query = document.getElementById('search-query').value;
+
+            // Envoi de la requête via fetch
+            fetch("{{ path('search') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ query: query })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Mise à jour des résultats
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = ''; // Réinitialiser le contenu des résultats
+
+                    data.cards.forEach(card => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.classList.add('bg-white', 'p-4', 'border', 'border-gray-200', 'rounded-lg', 'shadow-md');
+                        cardDiv.innerHTML = `<p class="text-center text-lg font-semibold">${card.username}</p>`;
+                        resultsDiv.appendChild(cardDiv);
+                    });
+                })
+                .catch(error => console.error('Erreur lors de la recherche:', error));
+        });
+    </script>
+
 {% endblock %}
