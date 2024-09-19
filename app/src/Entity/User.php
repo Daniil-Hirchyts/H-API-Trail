@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity('username', message: 'Ce login est déjà utilisé!')]
+#[UniqueEntity('username', message: 'Ce username est déjà utilisé!')]
 #[UniqueEntity('email', message: 'Cette adresse email est déjà utilisée!')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_LOGIN', fields: ['username'])]

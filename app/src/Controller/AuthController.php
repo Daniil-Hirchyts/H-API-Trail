@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthController extends AbstractController
 {
@@ -42,14 +43,20 @@ class AuthController extends AbstractController
                 return $this->redirectToRoute('app_home');
             }
         }
-        /*echo $form->isSubmitted();
-        echo $form->isValid();*/
-        //print_r($form->getData());
 
         // $this->flashMessageHelper->addFormErrorsAsFlash($form);
 
         return $this->render('auth/register.html.twig', [
             'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/login', name: 'login', methods: ['GET', 'POST'])]
+    public function connexion(Request $request, AuthenticationUtils $authenticationUtils): Response
+    {
+        $lastUsername = $authenticationUtils->getLastUsername();
+        return $this->render('auth/login.html.twig', [
+            'last_username' => $lastUsername,
         ]);
     }
 }

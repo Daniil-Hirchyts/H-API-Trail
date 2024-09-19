@@ -10,7 +10,7 @@ services:
     volumes:
       - ./app:/var/www/html
     ports:
-      - "8080:8000"
+      - "8085:8000"
     environment:
       APP_ENV: dev
     depends_on:

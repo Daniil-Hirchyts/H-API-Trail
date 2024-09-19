@@ -24,7 +24,5 @@ class UserManager implements UserManagerInterface
     {
         $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
         $user->setPassword($hashedPassword);
-
     }
-
 }
