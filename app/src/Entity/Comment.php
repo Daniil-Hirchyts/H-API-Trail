@@ -7,23 +7,25 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
+#[ORM\Table(name: '`comment`')]
 class Comment
 {
     #[ORM\Id]
     #[ORM\Column]
-    private ?string $id = null;
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
 
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
-    private ?string $sender = null;
+    private ?int $sender = null;
 
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull]
-    private ?string $recipient = null;
+    private ?int $recipient = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]

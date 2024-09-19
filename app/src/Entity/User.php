@@ -4,22 +4,24 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
-use App\Enum\Role;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\Doctrine\UuidType;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity('username', message: 'Ce username est déjà utilisé!')]
+#[UniqueEntity('username', message: 'Ce login est déjà utilisé!')]
 #[UniqueEntity('email', message: 'Cette adresse email est déjà utilisée!')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_LOGIN', fields: ['username'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?string $id = null;
+    private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
@@ -34,12 +36,13 @@ class User
     private ?bool $visible = null;
 
     #[ORM\Column(type: 'text')]
-    #[Assert\NotNull]
-    private ?string $hash = null;
+    private ?string $password = null;
 
-    #[ORM\Column(type: 'string', enumType: Role::class, options: ['default' => Role::USER])]
-    #[Assert\NotNull]
-    private Role $role;
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
+    private array $roles = [];
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $bio = null;
@@ -71,17 +74,19 @@ class User
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastname = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => "CURRENT_TIMESTAMP"])]
-    #[Assert\NotNull]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => "CURRENT_TIMESTAMP"])]
-    #[Assert\NotNull]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $updatedAt;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => "CURRENT_TIMESTAMP"])]
-    #[Assert\NotNull]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $lastLogin = null;
+
+    public function __construct()
+    {
+        $this->updatedAt = new \DateTime();
+    }
 
     public function getId(): ?string
     {
@@ -124,26 +129,36 @@ class User
         return $this;
     }
 
-    public function getHash(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
     {
-        return $this->hash;
+        return (string)$this->username;
     }
 
-    public function setHash(string $hash): static
+    /**
+     * @return list<string>
+     * @see UserInterface
+     *
+     */
+    public function getRoles(): array
     {
-        $this->hash = $hash;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
 
-        return $this;
+        return array_unique($roles);
     }
 
-    public function getRole(): Role
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
     {
-        return $this->role;
-    }
-
-    public function setRole(Role $role): static
-    {
-        $this->role = $role;
+        $this->roles = $roles;
 
         return $this;
     }
@@ -290,15 +305,37 @@ class User
         $this->name = $name;
     }
 
-    public function getSurname(): ?string
+    public function getLastname(): ?string
     {
-        return $this->surname;
+        return $this->lastname;
     }
 
-    public function setSurname(?string $surname): void
+    public function setLastname(?string $lastname): void
     {
-        $this->surname = $surname;
+        $this->lastname = $lastname;
     }
 
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
 
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
 }

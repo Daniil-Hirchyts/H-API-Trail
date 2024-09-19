@@ -12,8 +12,7 @@ class HomeController extends AbstractController
     public function index(): Response
     {
         return $this->render('home/index.html.twig', [
-            'controller_name' => 'HomeController',
-            'feur' => $_ENV['APP_ENV']
+            'controller_name' => 'HomeController'
         ]);
     }
 }

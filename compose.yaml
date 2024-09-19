@@ -12,10 +12,13 @@ services:
     ports:
       - "8080:8000"
     environment:
-        APP_ENV: dev
+      APP_ENV: dev
     depends_on:
-        database:
-          condition: service_healthy
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
@@ -26,13 +29,29 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-app}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_USER: ${POSTGRES_USER:-app}
+    restart: always
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}"]
+      test: [ "CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB:-app}", "-U", "${POSTGRES_USER:-app}" ]
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 2s
     volumes:
       - database_data:/var/lib/postgresql/data:rw
 
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
 volumes:
   database_data:
+  redis_data:
