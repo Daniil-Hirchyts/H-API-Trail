@@ -50,10 +50,25 @@ class RegisterForm extends AbstractType
                     ])
                 ]
             ])
+            ->add('confirmPassword', PasswordType::class, [
+                'required' => false,
+                'mapped' => false,
+                'attr' => [
+                    'minlength' => 8,
+                ],
+                'constraints' => [
+                    new Length([
+                        'min' => 8,
+                        'minMessage' => 'Le mot de passe doit comporter au moins {{ limit }} caractères.',
+                    ]),
+                ],
+            ])
             ->add('visible', CheckboxType::class, [
                 'required' => false,
             ])
-            ->add('register', SubmitType::class);
+            ->add('submit', SubmitType::class, [
+                'label' => 'Inscription',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

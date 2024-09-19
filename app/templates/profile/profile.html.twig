@@ -18,9 +18,9 @@
             <p>{{ profile.website }}</p>
             <p>{{ profile.job }}</p>
             {% if profile.visible %}
-            <p>Visible ✅</p>
+                <p>Visible ✅</p>
             {% else %}
-            <p>Visible ❌</p>
+                <p>Visible ❌</p>
             {% endif %}
             <p>{{ profile.createdAt|date('d/m/Y') }}</p>
             <p>{{ profile.updatedAt|date('d/m/Y') }}</p>
@@ -28,4 +28,7 @@
 
         </ul>
     </div>
+    <a href="/logout">
+        <button type="submit">Déconnexion</button>
+    </a>
 {% endblock %}

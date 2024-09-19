@@ -12,7 +12,6 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -33,12 +32,12 @@ class ProfileController extends AbstractController
         $user = $this->security->getUser();
 
         if (!$user instanceof User) {
-            throw new AccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+            return $this->redirectToRoute('login');
         }
 
         $profil = $this->userRepository->getAllInformation($user->getId());
 
-        return $this->render('user/profil.html.twig', [
+        return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
         ]);
     }
@@ -49,10 +48,10 @@ class ProfileController extends AbstractController
         $profil = $this->userRepository->getAllInformation($id);
 
         if (count($profil) == 0) {
-            throw new NotFoundHttpException('Profil non trouvé.');
+            return $this->render('not-found.html.twig');
         }
 
-        return $this->render('user/profil.html.twig', [
+        return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
         ]);
     }

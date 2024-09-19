@@ -3,32 +3,41 @@
 {% block title %}Inscription{% endblock %}
 
 {% block body %}
-    <main>
-        {{ form_start(form, {'attr': {'class': 'center basic-form'}}) }}
-        <fieldset>
-            <legend>Inscription</legend>
-            <div class="access-container">
-                {{ form_label(form.username) }}
-                <p class="help-input-form">Entre 4 et 20 caractères</p>
-                {{ form_widget(form.username) }}
-            </div>
-            <div class="access-container">
-                {{ form_label(form.password) }}
-                <p class="help-input-form">Entre 8 et 30 caractères, au moins une minuscule, une majuscule et un
-                    nombre</p>
-                {{ form_widget(form.password) }}
-            </div>
-            <div class="access-container">
-                {{ form_label(form.email) }}
-                {{ form_widget(form.email) }}
-            </div>
-            <div class="access-container">
-                {{ form_label(form.visible) }}
-                {{ form_widget(form.visible) }}
-            </div>
-            {{ form_widget(form.register, {'id' : 'inscription-submit', 'attr': {'class': 'basic-form-submit'}}) }}
-        </fieldset>
-        {{ form_rest(form) }}
-        {{ form_end(form) }}
+    <main class="flex flex-col justify-center items-center h-full grow">
+        <div class="max-w-xl w-full flex flex-col gap-4">
+            {{ form_start(form, {'attr': {'class': 'center basic-form'}}) }}
+            <fieldset class="flex flex-col gap-2">
+                <legend class="text-lg font-bold mb-3">Inscription</legend>
+
+                {% include 'components/form_field.html.twig' with {
+                    'help_text': 'Entre 4 et 20 caractères',
+                    'field': form.username
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.email
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.password
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.confirmPassword
+                } %}
+
+                {% include 'components/checkbox.html.twig' with {
+                    'field': form.visible,
+                    'label': 'Profile publique'
+                } %}
+
+                {% include 'components/submit.html.twig' with {
+                    'field': form.submit
+                } %}
+            </fieldset>
+            {{ form_rest(form) }}
+            {{ form_end(form) }}
+            <a href="{{ path('login') }}" class="text-indigo-600 hover:underline">Déjà inscrit ?</a>
+        </div>
     </main>
 {% endblock %}

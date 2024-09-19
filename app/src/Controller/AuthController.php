@@ -7,6 +7,7 @@ use App\Form\RegisterForm;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -33,14 +34,23 @@ class AuthController extends AbstractController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $plainPassword = $form['password']->getData();
-                $this->userManager->processNewUser($user, $plainPassword);
+                $confirmPassword = $form->get('confirmPassword')->getData();
 
-                $user->setLastLogin(new \DateTime());
-                $user->setCreatedAt(new \DateTime());
-                $entityManager->persist($user);
-                $entityManager->flush();
-                //$this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
-                return $this->redirectToRoute('app_home');
+                // Vérifier la confirmation du mot de passe
+                if ($plainPassword && $plainPassword !== $confirmPassword) {
+                    $form
+                        ->get('confirmPassword')
+                        ->addError(new FormError('Les mots de passe ne correspondent pas.'));
+                } else {
+                    $this->userManager->processNewUser($user, $plainPassword);
+
+                    $user->setLastLogin(new \DateTime());
+                    $user->setCreatedAt(new \DateTime());
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+                    //$this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
+                    return $this->redirectToRoute('app_home');
+                }
             }
         }
 
@@ -54,6 +64,10 @@ class AuthController extends AbstractController
     #[Route('/login', name: 'login', methods: ['GET', 'POST'])]
     public function connexion(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
+        // redirect to app_home if user is already logged in
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_home');
+        }
         $lastUsername = $authenticationUtils->getLastUsername();
         return $this->render('auth/login.html.twig', [
             'last_username' => $lastUsername,
