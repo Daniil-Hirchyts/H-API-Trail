@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+    <div class="container mx-auto mt-8">
+        <h1 class="text-2xl font-bold">Informations du profil</h1>
+        <ul class="mt-4">
+            <p>{{ profile.username }}</p>
+            <p>{{ profile.name }}</p>
+            <p>{{ profile.lastname }}</p>
+            <p>{{ profile.email }}</p>
+            <p>{{ profile.phone }}</p>
+            <p>{{ profile.address }}</p>
+            <p>{{ profile.country }}</p>
+            <p>{{ profile.zipCode }}</p>
+            <p>{{ profile.city }}</p>
+            <p>{{ profile.website }}</p>
+            <p>{{ profile.job }}</p>
+            {% if profile.visible %}
+            <p>Visible ✅</p>
+            {% else %}
+            <p>Visible ❌</p>
+            {% endif %}
+            <p>{{ profile.createdAt|date('d/m/Y') }}</p>
+            <p>{{ profile.updatedAt|date('d/m/Y') }}</p>
+            <p>{{ profile.lastLogin|date('d/m/Y') }}</p>
+
+        </ul>
+    </div>
+{% endblock %}
