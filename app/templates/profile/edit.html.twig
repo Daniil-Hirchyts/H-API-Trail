@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Profil{% endblock %}
+
+{% block body %}
+    <main class="flex flex-col justify-center items-center">
+        <div class="max-w-xl w-full">
+            {{ form_start(form, {'attr': {'class': 'center basic-form'}}) }}
+            <fieldset class="flex flex-col gap-2">
+                <legend>Modifier le Profil</legend>
+
+                {% include 'components/form_field.html.twig' with {
+                    'help_text': 'Entre 4 et 20 caractères',
+                    'field': form.username
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.bio,
+                    'help_text': 'Une courte biographie (optionnel)'
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.phone,
+                    'help_text': 'Numéro de téléphone (optionnel)'
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.address
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.country
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.city
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.zipCode
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.website
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.job
+                } %}
+
+                {% include 'components/checkbox.html.twig' with {
+                    'field': form.visible,
+                    'label': 'Profile publique'
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.password,
+                    'help_text': 'Laissez vide si vous ne souhaitez pas changer de mot de passe'
+                } %}
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.confirmPassword,
+                    'help_text': 'Confirmez le nouveau mot de passe si modifié'
+                } %}
+
+                {% include 'components/submit.html.twig' with {
+                    'field': form.submit
+                } %}
+            </fieldset>
+
+            {{ form_rest(form) }}
+            {{ form_end(form) }}
+        </div>
+    </main>
+{% endblock %}

@@ -25,4 +25,9 @@ class UserManager implements UserManagerInterface
         $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
         $user->setPassword($hashedPassword);
     }
+
+    public function encodePassword(User $user, string $plainPassword): string
+    {
+        return $this->passwordHasher->hashPassword($user, $plainPassword);
+    }
 }

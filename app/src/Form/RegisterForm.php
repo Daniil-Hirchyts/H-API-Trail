@@ -50,7 +50,9 @@ class RegisterForm extends AbstractType
                     ])
                 ]
             ])
-            ->add('visible', CheckboxType::class)
+            ->add('visible', CheckboxType::class, [
+                'required' => false,
+            ])
             ->add('register', SubmitType::class);
     }
 
