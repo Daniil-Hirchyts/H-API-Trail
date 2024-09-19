@@ -88,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->updatedAt = new \DateTime();
     }
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }

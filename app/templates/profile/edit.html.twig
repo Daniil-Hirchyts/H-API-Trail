@@ -4,15 +4,36 @@
 
 {% block body %}
     <main class="flex flex-col justify-center items-center">
-        <div class="max-w-xl w-full">
+        <div class="mt-8 max-w-4xl w-full bg-white rounded-xl overflow-hidden border-gray-200 border-[1px] p-6">
             {{ form_start(form, {'attr': {'class': 'center basic-form'}}) }}
-            <fieldset class="flex flex-col gap-2">
-                <legend class="text-lg font-bold mb-3">Modifier le Profil</legend>
+            <fieldset class="flex flex-col gap-4">
+                <div class="flex justify-between items-center">
+                    <legend class="text-xl font-bold mb-3">Éditer le profil</legend>
+
+                    {% include 'components/checkbox.html.twig' with {
+                        'field': form.visible,
+                        'label': 'Profil publique',
+                        'reverse': true
+                    } %}
+                </div>
 
                 {% include 'components/form_field.html.twig' with {
                     'help_text': 'Entre 4 et 20 caractères',
                     'field': form.username
                 } %}
+
+                <div class="flex gap-2 w-full">
+                    {% include 'components/form_field.html.twig' with {
+                        'field': form.name
+                    } %}
+
+                    {% include 'components/form_field.html.twig' with {
+                        'field': form.lastname
+                    } %}
+                </div>
+                <div class="border-t-[1px] border-gray-200 w-full my-4"></div>
+
+                <h2 class="text-lg font-bold">Coordonnées</h2>
 
                 {% include 'components/form_field.html.twig' with {
                     'field': form.bio,
@@ -24,21 +45,29 @@
                     'help_text': 'Numéro de téléphone (optionnel)'
                 } %}
 
-                {% include 'components/form_field.html.twig' with {
-                    'field': form.address
-                } %}
+                <div class="border-t-[1px] border-gray-200 w-full my-4"></div>
 
-                {% include 'components/form_field.html.twig' with {
-                    'field': form.country
-                } %}
+                <h2 class="text-lg font-bold">Adresse</h2>
 
-                {% include 'components/form_field.html.twig' with {
-                    'field': form.city
-                } %}
+                <div class="flex gap-2">
+                    {% include 'components/form_field.html.twig' with {
+                        'field': form.address
+                    } %}
 
-                {% include 'components/form_field.html.twig' with {
-                    'field': form.zipCode
-                } %}
+                    {% include 'components/select.html.twig' with {
+                        'field': form.country
+                    } %}
+                </div>
+
+                <div class="flex gap-2 w-full">
+                    {% include 'components/form_field.html.twig' with {
+                        'field': form.city
+                    } %}
+
+                    {% include 'components/form_field.html.twig' with {
+                        'field': form.zipCode
+                    } %}
+                </div>
 
                 {% include 'components/form_field.html.twig' with {
                     'field': form.website
@@ -48,10 +77,8 @@
                     'field': form.job
                 } %}
 
-                {% include 'components/checkbox.html.twig' with {
-                    'field': form.visible,
-                    'label': 'Profile publique'
-                } %}
+                <div class="border-t-[1px] border-gray-200 w-full my-4"></div>
+                <h2 class="text-lg font-bold">Mot de passe</h2>
 
                 {% include 'components/form_field.html.twig' with {
                     'field': form.password,

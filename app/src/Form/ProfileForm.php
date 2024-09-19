@@ -3,8 +3,10 @@
 namespace App\Form;
 
 use App\Entity\User;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -17,6 +19,13 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 class ProfileForm extends AbstractType
 {
+    private $countries;
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->countries = $params->get('countries');
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -35,7 +44,40 @@ class ProfileForm extends AbstractType
                     ]),
                 ],
             ])
+            ->add('name', TextType::class, [
+                'label' => 'Prénom',
+                'attr' => [
+                    'minlength' => 3,
+                    'maxlength' => 30,
+                ],
+                'constraints' => [
+                    new NotBlank(),
+                    new Length([
+                        'min' => 3,
+                        'minMessage' => 'Le nom doit comporter au moins {{ limit }} caractères.',
+                        'max' => 30,
+                        'maxMessage' => 'Le nom ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
+            ])
+            ->add('lastname', TextType::class, [
+                'label' => 'Nom',
+                'attr' => [
+                    'minlength' => 3,
+                    'maxlength' => 30,
+                ],
+                'constraints' => [
+                    new NotBlank(),
+                    new Length([
+                        'min' => 3,
+                        'minMessage' => 'Le prénom doit comporter au moins {{ limit }} caractères.',
+                        'max' => 30,
+                        'maxMessage' => 'Le prénom ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
+            ])
             ->add('bio', TextareaType::class, [
+                'label' => 'Biographie',
                 'required' => false,
                 'attr' => [
                     'maxlength' => 255,
@@ -48,28 +90,64 @@ class ProfileForm extends AbstractType
                 ],
             ])
             ->add('phone', TextType::class, [
+                'label' => 'Téléphone',
                 'required' => false,
                 'attr' => [
                     'maxlength' => 15,
                 ],
             ])
             ->add('address', TextType::class, [
+                'label' => 'Adresse',
                 'required' => false,
             ])
-            ->add('country', TextType::class, [
+            ->add('country', ChoiceType::class, [
+                'label' => 'Pays',
                 'required' => false,
+                'choices' => $this->countries,
+                'choice_label' => function ($choice, $key, $value) {
+                    return $value;
+                },
+                'placeholder' => 'Sélectionnez un pays',
             ])
             ->add('city', TextType::class, [
+                'label' => 'Ville',
                 'required' => false,
+                'attr' => [
+                    'maxlength' => 30,
+                ],
+                'constraints' => [
+                    new Length([
+                        'max' => 30,
+                        'maxMessage' => 'La ville ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ]
             ])
             ->add('zipCode', TextType::class, [
                 'required' => false,
+                'label' => 'Code postal',
+                'attr' => [
+                    'maxlength' => 5,
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '#^\d{5}$#',
+                        'message' => 'Le code postal doit comporter 5 chiffres.',
+                    ]),
+                ],
             ])
             ->add('website', TextType::class, [
                 'required' => false,
+                'label' => 'Site web',
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '#^https?://#',
+                        'message' => 'Le site web doit commencer par http:// ou https://.',
+                    ]),
+                ],
             ])
             ->add('job', TextType::class, [
                 'required' => false,
+                'label' => 'Profession',
             ])
             ->add('visible', CheckboxType::class, [
                 'required' => false,
@@ -94,6 +172,7 @@ class ProfileForm extends AbstractType
                         'message' => 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.',
                     ]),
                 ],
+                'label' => 'Mot de passe',
             ])
             ->add('confirmPassword', PasswordType::class, [
                 'required' => false,
@@ -107,6 +186,7 @@ class ProfileForm extends AbstractType
                         'minMessage' => 'Le mot de passe doit comporter au moins {{ limit }} caractères.',
                     ]),
                 ],
+                'label' => 'Confirmer le mot de passe',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Mettre à jour le profil',

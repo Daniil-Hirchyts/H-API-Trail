@@ -12,7 +12,7 @@ if [ "$APP_ENV" = "prod" ]; then
 
     exec apache2-foreground
 else
-    symfony server:start --no-tls --port=8888 --allow-http & npm run watch
+    symfony server:start --no-tls --port=8888 --allow-http
 fi
 
 wait

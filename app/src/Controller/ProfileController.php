@@ -39,6 +39,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
+            'mine' => true
         ]);
     }
 
@@ -73,11 +74,13 @@ class ProfileController extends AbstractController
                     );
                 }
 
+                $user->setUpdatedAt(new \DateTime());
+
                 $this->entityManager->flush();
 
                 $this->addFlash('success', 'Profil mis à jour avec succès.');
 
-                return $this->redirectToRoute('profile_edit');
+                return $this->redirectToRoute('app_profile');
             }
         }
 
@@ -95,8 +98,12 @@ class ProfileController extends AbstractController
             return $this->render('not-found.html.twig');
         }
 
+        $user = $this->security->getUser();
+        $isMine = $user && $user->getId() === $id;
+
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
+            'mine' => $isMine
         ]);
     }
 }

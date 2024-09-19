@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegisterForm;
-use App\Service\FlashMessageHelper;
 use App\Service\FlashMessageHelperInterface;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +17,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AuthController extends AbstractController
 {
     public function __construct(
-        private readonly UserManager $userManager,
+        private readonly UserManager                 $userManager,
         private readonly FlashMessageHelperInterface $flashMessageHelper
     )
     {
@@ -57,7 +56,7 @@ class AuthController extends AbstractController
             }
         }
 
-         $this->flashMessageHelper->addFormErrorsAsFlash($form);
+        $this->flashMessageHelper->addFormErrorsAsFlash($form);
 
         return $this->render('auth/register.html.twig', [
             'form' => $form->createView()
@@ -67,7 +66,6 @@ class AuthController extends AbstractController
     #[Route('/login', name: 'login', methods: ['GET', 'POST'])]
     public function connexion(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
-        // redirect to app_home if user is already logged in
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
         }

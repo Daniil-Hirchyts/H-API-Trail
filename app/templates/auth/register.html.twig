@@ -4,10 +4,10 @@
 
 {% block body %}
     <main class="flex flex-col justify-center items-center h-full grow">
-        <div class="max-w-xl w-full flex flex-col gap-4">
+        <div class="max-w-lg w-full flex flex-col gap-4 mt-8 bg-white rounded-xl overflow-hidden border-gray-200 border-[1px] p-4">
             {{ form_start(form, {'attr': {'class': 'center basic-form'}}) }}
             <fieldset class="flex flex-col gap-2">
-                <legend class="text-lg font-bold mb-3">Inscription</legend>
+                <legend class="text-xl font-bold mb-4">Inscription</legend>
 
                 {% include 'components/form_field.html.twig' with {
                     'help_text': 'Entre 4 et 20 caractères',

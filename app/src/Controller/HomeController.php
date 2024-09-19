@@ -39,9 +39,7 @@ class HomeController extends AbstractController
         // Transformation du résultat en format JSON
         $formattedResults = [];
         foreach ($results as $result) {
-            $formattedResults[] = [
-                'username' => $result['username'],
-            ];
+            $formattedResults[] = $result;
         }
 
         // Retourner les résultats sous forme de JSON

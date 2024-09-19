@@ -4,28 +4,37 @@
 
 {% block body %}
 
-    <form id="search-form" class="mb-4">
-        <input
-                type="text"
-                id="search-query"
-                name="query"
-                placeholder="Rechercher..."
-                class="border p-2 rounded w-full"
-        />
-        <button
-                type="submit"
-                class="bg-blue-500 text-white p-2 rounded mt-2 w-full">
-            Rechercher
-        </button>
-    </form>
-
-    <div id="results" class="grid grid-cols-3 gap-4">
-        {% for card in cards %}
-            <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-md">
-                <p class="text-center text-lg font-semibold">{{ card.username }}</p>
+    <main class="flex flex-col justify-start pt-6 items-center h-full grow px-4">
+        <div class="max-w-4xl w-full flex flex-col gap-4">
+            <div class="relative flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"
+                     class="absolute left-4 stroke-1 stroke-gray-900">
+                    <path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
+                </svg>
+                <input
+                        type="text"
+                        id="search-query"
+                        name="query"
+                        placeholder="Rechercher..."
+                        class="block w-full rounded-lg border-0 p-4 pl-12 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-900 focus:ring-[1px] focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
             </div>
-        {% endfor %}
-    </div>
+
+            <div id="results" class="flex flex-col gap-4">
+                {% for card in cards %}
+                    <div class="bg-white p-4 border border-gray-200 rounded-lg">
+                        <a href="{{ path('app_profile_by_id', {'id': card.id}) }}"
+                           class="hover:underline text-center text-lg font-semibold">
+                            {{ card.username }}
+                        </a>
+                        {% if card.bio %}
+                            <p class="mt-2">{{ card.bio|default('')|slice(0, 200)|trim }}{{ card.bio|length > 200 ? '...' : '' }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
 
     <script>
         let debounceTimeout; // Variable pour stocker le timeout
@@ -57,8 +66,16 @@
                         if (data.cards && data.cards.length > 0) {
                             data.cards.forEach(card => {
                                 const cardDiv = document.createElement('div');
-                                cardDiv.classList.add('bg-white', 'p-4', 'border', 'border-gray-200', 'rounded-lg', 'shadow-md');
-                                cardDiv.innerHTML = `<p class="text-center text-lg font-semibold">${card.username}</p>`;
+                                let bio = card.bio || ''
+                                if (bio.length > 200) {
+                                    bio = bio.slice(0, 200).trim() + '...';
+                                }
+                                cardDiv.className = 'bg-white p-4 border border-gray-200 rounded-lg';
+                                cardDiv.innerHTML = `<a href="/profile/${card.id}"
+                                   class="hover:underline text-center text-lg font-semibold">
+                                    ${card.username}
+                                </a>
+                                ${card.bio ? `<p class="mt-2">${bio}</p>` : ''}`;
                                 resultsDiv.appendChild(cardDiv);
                             });
                         } else {
