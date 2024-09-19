@@ -20,6 +20,7 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->select('u.username')
+            ->where('u.visible = TRUE')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->getArrayResult();
@@ -40,7 +41,7 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->select('u.username')
-            ->where('LOWER(u.username) LIKE LOWER(:query)')
+            ->where('LOWER(u.username) LIKE LOWER(:query) and u.visible = TRUE')
             ->setParameter('query', '%' . strtolower($query) . '%')
             ->orderBy('u.id', 'ASC')
             ->getQuery()

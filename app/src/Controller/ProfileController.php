@@ -42,20 +42,6 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/{id}', name: 'app_profile_by_id', methods: ['GET'])]
-    public function profileById(int $id): Response
-    {
-        $profil = $this->userRepository->getAllInformation($id);
-
-        if (count($profil) == 0) {
-            return $this->render('not-found.html.twig');
-        }
-
-        return $this->render('profile/profile.html.twig', [
-            'profile' => $profil[0],
-        ]);
-    }
-
     #[Route('/profile/edit', name: 'profile_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request): Response
     {
@@ -97,6 +83,20 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/edit.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/profile/{id}', name: 'app_profile_by_id', methods: ['GET'])]
+    public function profileById(int $id): Response
+    {
+        $profil = $this->userRepository->getAllInformation($id);
+
+        if (count($profil) == 0) {
+            return $this->render('not-found.html.twig');
+        }
+
+        return $this->render('profile/profile.html.twig', [
+            'profile' => $profil[0],
         ]);
     }
 }

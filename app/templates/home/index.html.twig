@@ -28,36 +28,47 @@
     </div>
 
     <script>
-        document.getElementById('search-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        let debounceTimeout; // Variable pour stocker le timeout
 
-            // Récupération de la valeur de recherche
-            const query = document.getElementById('search-query').value;
+        document.getElementById('search-query').addEventListener('input', function (e) {
+            const query = e.target.value;
 
-            // Envoi de la requête via fetch
-            fetch("{{ path('search') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ query: query })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Mise à jour des résultats
-                    const resultsDiv = document.getElementById('results');
-                    resultsDiv.innerHTML = ''; // Réinitialiser le contenu des résultats
+            // Effacer le timeout précédent si l'utilisateur continue de taper
+            clearTimeout(debounceTimeout);
 
-                    data.cards.forEach(card => {
-                        const cardDiv = document.createElement('div');
-                        cardDiv.classList.add('bg-white', 'p-4', 'border', 'border-gray-200', 'rounded-lg', 'shadow-md');
-                        cardDiv.innerHTML = `<p class="text-center text-lg font-semibold">${card.username}</p>`;
-                        resultsDiv.appendChild(cardDiv);
-                    });
+            // Attendre 500ms avant d'envoyer la requête (ajuster le délai si nécessaire)
+            debounceTimeout = setTimeout(() => {
+                // Envoi de la requête via fetch
+                fetch("/search", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({query: query})
                 })
-                .catch(error => console.error('Erreur lors de la recherche:', error));
+                    .then(response => response.json())
+                    .then(data => {
+                        // Mise à jour des résultats
+                        const resultsDiv = document.getElementById('results');
+                        resultsDiv.innerHTML = ''; // Réinitialiser le contenu des résultats
+
+                        // Vérifier s'il y a des résultats
+                        if (data.cards && data.cards.length > 0) {
+                            data.cards.forEach(card => {
+                                const cardDiv = document.createElement('div');
+                                cardDiv.classList.add('bg-white', 'p-4', 'border', 'border-gray-200', 'rounded-lg', 'shadow-md');
+                                cardDiv.innerHTML = `<p class="text-center text-lg font-semibold">${card.username}</p>`;
+                                resultsDiv.appendChild(cardDiv);
+                            });
+                        } else {
+                            resultsDiv.innerHTML = '<p>Aucun résultat trouvé.</p>';
+                        }
+                    })
+                    .catch(error => console.error('Erreur lors de la recherche:', error));
+            }, 500); // Le délai est de 500ms
         });
     </script>
+
 
 {% endblock %}
