@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\ProfileForm;
+use App\Repository\UserRepository;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +12,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -19,9 +21,40 @@ class ProfileController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security               $security,
-        private readonly UserManager            $userManager
+        private readonly UserManager            $userManager,
+        private readonly UserRepository         $userRepository
     )
     {
+    }
+
+    #[Route('/profile', name: 'app_profile', methods: ['GET'])]
+    public function profile(): Response
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            throw new AccessDeniedException('Vous devez être connecté pour accéder à cette page.');
+        }
+
+        $profil = $this->userRepository->getAllInformation($user->getId());
+
+        return $this->render('user/profil.html.twig', [
+            'profile' => $profil[0],
+        ]);
+    }
+
+    #[Route('/profile/{id}', name: 'app_profile_by_id', methods: ['GET'])]
+    public function profileById(int $id): Response
+    {
+        $profil = $this->userRepository->getAllInformation($id);
+
+        if (count($profil) == 0) {
+            throw new NotFoundHttpException('Profil non trouvé.');
+        }
+
+        return $this->render('user/profil.html.twig', [
+            'profile' => $profil[0],
+        ]);
     }
 
     #[Route('/profile/edit', name: 'profile_edit', methods: ['GET', 'POST'])]
