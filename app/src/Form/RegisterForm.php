@@ -22,6 +22,7 @@ class RegisterForm extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
+                'label' => 'Nom d\'utilisateur',
                 'attr' => [
                     'minlength' => 3,
                     'maxlength' => 30,
@@ -29,6 +30,7 @@ class RegisterForm extends AbstractType
             ])
             ->add('email', EmailType::class)
             ->add('password', PasswordType::class, [
+                'label' => 'Mot de passe',
                 "mapped" => false,
                 'attr' => [
                     'minlength' => 8,
@@ -51,6 +53,7 @@ class RegisterForm extends AbstractType
                 ]
             ])
             ->add('confirmPassword', PasswordType::class, [
+                'label' => 'Confirmer le mot de passe',
                 'required' => false,
                 'mapped' => false,
                 'attr' => [

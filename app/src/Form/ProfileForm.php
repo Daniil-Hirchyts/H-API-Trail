@@ -7,8 +7,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -89,17 +91,30 @@ class ProfileForm extends AbstractType
                     ]),
                 ],
             ])
-            ->add('phone', TextType::class, [
+            ->add('phone', TelType::class, [
                 'label' => 'Téléphone',
                 'required' => false,
                 'attr' => [
                     'maxlength' => 15,
                 ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^(?:\+33|0033|0)[1-9](?:[\s.-]?[0-9]{2}){4}$/',
+                        'message' => 'Veuillez renseigner un numéro de téléphone valide.',
+                    ]),
+                ],
             ])
             ->add('address', TextType::class, [
                 'label' => 'Adresse',
                 'required' => false,
+                'constraints' => [
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'L’adresse ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
+            ->add('email', EmailType::class)
             ->add('country', ChoiceType::class, [
                 'label' => 'Pays',
                 'required' => false,
@@ -113,11 +128,11 @@ class ProfileForm extends AbstractType
                 'label' => 'Ville',
                 'required' => false,
                 'attr' => [
-                    'maxlength' => 30,
+                    'maxlength' => 255,
                 ],
                 'constraints' => [
                     new Length([
-                        'max' => 30,
+                        'max' => 255,
                         'maxMessage' => 'La ville ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                 ]
@@ -148,6 +163,12 @@ class ProfileForm extends AbstractType
             ->add('job', TextType::class, [
                 'required' => false,
                 'label' => 'Profession',
+                'constraints' => [
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'La profession ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
             ->add('visible', CheckboxType::class, [
                 'required' => false,
