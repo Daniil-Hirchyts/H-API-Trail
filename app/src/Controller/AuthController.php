@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegisterForm;
+use App\Service\FlashMessageHelper;
+use App\Service\FlashMessageHelperInterface;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +17,8 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AuthController extends AbstractController
 {
     public function __construct(
-        private readonly UserManager $userManager
+        private readonly UserManager $userManager,
+        private readonly FlashMessageHelperInterface $flashMessageHelper
     )
     {
     }
@@ -39,12 +42,12 @@ class AuthController extends AbstractController
                 $user->setCreatedAt(new \DateTime());
                 $entityManager->persist($user);
                 $entityManager->flush();
-                //$this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
+                $this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
                 return $this->redirectToRoute('app_home');
             }
         }
 
-        // $this->flashMessageHelper->addFormErrorsAsFlash($form);
+         $this->flashMessageHelper->addFormErrorsAsFlash($form);
 
         return $this->render('auth/register.html.twig', [
             'form' => $form->createView()

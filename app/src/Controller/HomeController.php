@@ -34,8 +34,8 @@ class HomeController extends AbstractController
         $query = $data['query'] ?? '';
 
         // Exécuter la requête de recherche
-        $results = $this->userRepository->findBySearchQuery($query);
-
+        if ($query != '') $results = $this->userRepository->findBySearchQuery($query);
+        else $results = $this->userRepository->getCardUsernames();
         // Transformation du résultat en format JSON
         $formattedResults = [];
         foreach ($results as $result) {
