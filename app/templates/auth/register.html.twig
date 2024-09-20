@@ -30,6 +30,9 @@
                     </button>
                 </div>
 
+                <!-- Ajoute un span vide ici pour les messages -->
+                <span id="usernameMessage" class="text-sm"></span>
+
                 {% include 'components/form_field.html.twig' with {
                     'field': form.email,
                     'required': true
@@ -61,13 +64,7 @@
             <a href="{{ path('login') }}" class="text-indigo-600 hover:underline">Déjà inscrit ?</a>
         </div>
     </main>
-
     <script>
-        updateUsername()
-
-        function updateUsername() {
-            const username = document.getElementById('register_form_username')
-            username.value = getRandomCombination()
-        }
+        updateUsername();
     </script>
 {% endblock %}

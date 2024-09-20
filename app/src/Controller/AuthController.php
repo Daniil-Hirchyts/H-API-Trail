@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegisterForm;
+use App\Repository\UserRepository;
 use App\Service\FlashMessageHelperInterface;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,7 +20,8 @@ class AuthController extends AbstractController
 {
     public function __construct(
         private readonly UserManager                 $userManager,
-        private readonly FlashMessageHelperInterface $flashMessageHelper
+        private readonly FlashMessageHelperInterface $flashMessageHelper,
+        private readonly UserRepository              $userRepository
     )
     {
     }
@@ -73,5 +76,16 @@ class AuthController extends AbstractController
         return $this->render('auth/login.html.twig', [
             'last_username' => $lastUsername,
         ]);
+    }
+
+    #[Route('/check_username/{username}', name: 'check_username', methods: ['GET'])]
+    public function checkUsername($username): JsonResponse
+    {
+        $user = $this->userRepository->getUserByUsername($username);
+
+        if (!empty($user)) {
+            return $this->json(['available' => false], 400);
+        }
+        return $this->json(['available' => true], 400);
     }
 }
