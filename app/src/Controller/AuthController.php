@@ -84,8 +84,8 @@ class AuthController extends AbstractController
         $user = $this->userRepository->getUserByUsername($username);
 
         if (!empty($user)) {
-            return $this->json(['available' => false], 400);
+            return $this->json(['available' => false]);
         }
-        return $this->json(['available' => true], 400);
+        return $this->json(['available' => true]);
     }
 }

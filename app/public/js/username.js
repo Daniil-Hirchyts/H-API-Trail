@@ -4,7 +4,7 @@ const words = [
     'montagne', 'rivière', 'plage', 'ville', 'campagne', 'jardin', 'plante', 'poulet', 'boeuf', 'poisson',
     'pain', 'fromage', 'vin', 'café', 'thé', 'bouteille', 'verre', 'assiette', 'fourchette', 'cuillère',
     'lampe', 'rideau', 'canapé', 'lit', 'matelas', 'couverture', 'oreiller', 'tapis', 'carte', 'route',
-    'avion', 'train', 'bateau', 'bus', 'métro', 'vélo', 'motocyclette', 'moto', 'coeur', 'amour',
+    'avion', 'train', 'bateau', 'bus', 'métro', 'vélo', 'motocyclette', 'moto', 'nword', 'coeur', 'amour',
     'famille', 'ami', 'collègue', 'professeur', 'élève', 'enfant', 'adulte', 'sport', 'musique', 'film',
     'jeu', 'ordinateur', 'internet', 'site', 'application', 'message', 'réseau', 'ordinateur', 'programme',
     'code', 'clé', 'cadenas', 'journal', 'magazine', 'article', 'roman', 'poème', 'novella', 'scène',
