@@ -8,7 +8,15 @@
 
 {% block body %}
     <main class="flex flex-col justify-center items-center">
-        <div class="mt-8 max-w-4xl w-full bg-white rounded-xl overflow-hidden border-gray-200 border-[1px] p-6">
+        <div class="max-w-4xl w-full flex justify-between items-center mt-8 mb-4">
+            <a href="{{ path('app_profile') }}" class="flex items-center gap-2 text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M7.82843 10.9999H20V12.9999H7.82843L13.1924 18.3638L11.7782 19.778L4 11.9999L11.7782 4.22168L13.1924 5.63589L7.82843 10.9999Z"></path>
+                </svg>
+                Retour au profil
+            </a>
+        </div>
+        <div class="max-w-4xl w-full bg-white rounded-xl overflow-hidden border-gray-200 border-[1px] p-6">
             {{ form_start(form, {'attr': {'class': 'center basic-form'}}) }}
             <fieldset class="flex flex-col gap-4">
                 <div class="flex justify-between items-center">
@@ -19,6 +27,44 @@
                         'label': 'Profil publique',
                         'reverse': true
                     } %}
+                </div>
+
+                <div class="flex justify-center w-full h-[15vh] mb-10 relative">
+                    <div id="banner-preview"
+                         class="w-full h-full bg-indigo-200 bg-cover bg-center bg-no-repeat rounded-xl"
+                         style="{{ (banner is defined and banner is not null )  ? "background-image: url('" ~ banner_path(banner) ~ "');" : '' }}">
+                        <label class="cursor-pointer w-full h-full opacity-0 hover:opacity-100 bg-black/50 flex items-center justify-center text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
+                                 fill="currentColor">
+                                <path d="M4 19H20V12H22V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V12H4V19ZM13 9V16H11V9H6L12 3L18 9H13Z"></path>
+                            </svg>
+                            {{ form_widget(form.banner, { 'attr': {
+                                'class': 'hidden',
+                                'onchange': 'loadFile(event, \'banner-preview\')'
+                            }
+                            }) }}
+                        </label>
+                    </div>
+                    <div id="avatar-preview"
+                         class="absolute -bottom-[50px] rounded-full overflow-hidden border-white border-[6px] w-[100px] h-[100px] bg-no-repeat bg-cover bg-center"
+                         style="background-image: url('{{ avatar_path(avatar) }}')">
+                        <label class="cursor-pointer w-full h-full opacity-0 hover:opacity-100 bg-black/50 flex items-center justify-center text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"
+                                 fill="currentColor">
+                                <path d="M4 19H20V12H22V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V12H4V19ZM13 9V16H11V9H6L12 3L18 9H13Z"></path>
+                            </svg>
+                            {{ form_widget(form.avatar, { 'attr': {
+                                'class': 'hidden',
+                                'onchange': 'loadFile(event, \'avatar-preview\')'
+                            }
+                            }) }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="text-xs mt-1 !text-red-500">
+                    {{ form_errors(form.banner) }}
+                    {{ form_errors(form.avatar) }}
                 </div>
 
                 <div class="flex gap-2 items-end">
@@ -121,6 +167,12 @@
         function updateUsername() {
             const username = document.getElementById('profile_form_username')
             username.value = getRandomCombination()
+        }
+
+        function loadFile(event, id) {
+            console.log(id)
+            const file = event.target.files[0];
+            document.getElementById(id).style.backgroundImage = 'url(' + URL.createObjectURL(file) + ')';
         }
     </script>
 {% endblock %}

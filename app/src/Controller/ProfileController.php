@@ -36,7 +36,6 @@ class ProfileController extends AbstractController
         }
 
         $profil = $this->userRepository->getAllInformation($user->getId());
-
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
             'mine' => true
@@ -60,6 +59,8 @@ class ProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->get('password')->getData();
             $confirmPassword = $form->get('confirmPassword')->getData();
+            $avatar = $form->get('avatar')->getData();
+            $banner = $form->get('banner')->getData();
 
             // Vérifier la confirmation du mot de passe
             if ($plainPassword && $plainPassword !== $confirmPassword) {
@@ -76,6 +77,18 @@ class ProfileController extends AbstractController
 
                 $user->setUpdatedAt(new \DateTime());
 
+                try {
+                    $this->userManager->saveAvatar($user, $avatar);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de votre photo de profil.');
+                }
+
+                try {
+                    $this->userManager->saveBanner($user, $banner);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de votre bannière.');
+                }
+
                 $this->entityManager->flush();
 
                 $this->addFlash('success', 'Profil mis à jour avec succès.');
@@ -86,6 +99,8 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/edit.html.twig', [
             'form' => $form->createView(),
+            'banner' => $user->getBanner(),
+            'avatar' => $user->getAvatar()
         ]);
     }
 

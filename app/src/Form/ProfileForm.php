@@ -56,10 +56,25 @@ class ProfileForm extends AbstractType
                 ],
                 "constraints" => [
                     new File(
-                        maxSize: '10M',
+                        maxSize: '20M',
                         maxSizeMessage: 'Le fichier est trop lourd',
-                        extensions: ['jpg', 'png'],
-                        extensionsMessage: 'Le fichier doit être une image (jpg, png)'
+                        extensions: ['jpg', 'jpeg', 'png'],
+                        extensionsMessage: 'Le fichier doit être une image (jpg, jpeg, png)'
+                    )
+                ]
+            ])
+            ->add('banner', FileType::class, [
+                "mapped" => false,
+                'required' => false,
+                'attr' => [
+                    'accept' => 'image/*',
+                ],
+                "constraints" => [
+                    new File(
+                        maxSize: '20M',
+                        maxSizeMessage: 'Le fichier est trop lourd',
+                        extensions: ['jpg', 'jpeg', 'png'],
+                        extensionsMessage: 'Le fichier doit être une image (jpg, pjeg, png)'
                     )
                 ]
             ])

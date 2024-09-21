@@ -76,15 +76,45 @@
             <img src="/favicon.ico" alt="Logo" class="h-6"/>
             <span>LDS</span>
         </a>
-        <div class="flex space-x-4">
+        <div class="flex space-x-4 items-center">
             {% if app.user %}
-                <a href="{{ path('app_profile') }}" class="text-gray-900 hover:text-gray-800">Mon Profil</a>
-                <a href="/logout" class="text-gray-900 hover:text-gray-800">Déconnexion</a>
+                <div class="hs-dropdown relative flex justify-end">
+                    <button id="hs-dropdown-custom-trigger" type="button"
+                            class="hs-dropdown-toggle py-1 ps-1 pe-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-full bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                            aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+                        <img class="w-8 h-8 object-center object-cover rounded-full"
+                             src="{{ avatar_path(app.user.avatar) }}"
+                             alt="Avatar">
+                        <span class="text-gray-600 font-medium truncate max-w-[7.5rem]">{{ app.user.username }}</span>
+                        <svg class="size-4 transition-all duration-200" id="profile-arrow"
+                             xmlns="http://www.w3.org/2000/svg" width="24"
+                             height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </button>
+
+                    <div class="hs-dropdown-menu absolute top-[45px] transition-[opacity,margin] duration z-[999]
+            hs-dropdown-open:opacity-100 hidden min-w-[200px] bg-white shadow-md rounded-lg p-1 space-y-0.5"
+                         role="menu" aria-orientation="vertical" aria-labelledby="hs-dropdown-custom-trigger">
+                        <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                           href="{{ path('app_profile') }}">
+                            Profile
+                        </a>
+                        <a class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                           href="/logout">
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
             {% else %}
                 <a href="{{ path('login') }}" class="text-gray-900 hover:text-gray-800">Connexion</a>
-                <a href="{{ path('register') }}" class="text-gray-900 hover:text-gray-800">Inscription</a>
+                <a href="{{ path('register') }}"
+                   class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Inscription</a>
             {% endif %}
         </div>
+
+
     </div>
 </nav>
 
@@ -130,6 +160,29 @@
             }
         }, 500);
     }
+
+    const dropdownTrigger = document.getElementById('hs-dropdown-custom-trigger');
+    const dropdownMenu = document.querySelector('.hs-dropdown-menu');
+    const profileArrow = document.getElementById('profile-arrow');
+
+    dropdownTrigger.addEventListener('click', () => {
+        dropdownMenu.classList.toggle('hidden');
+        profileArrow.classList.toggle('rotate-180');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.add('hidden');
+            profileArrow.classList.remove('rotate-180');
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            dropdownMenu.classList.add('hidden');
+            profileArrow.classList.remove('rotate-180');
+        }
+    });
 </script>
 </body>
 </html>

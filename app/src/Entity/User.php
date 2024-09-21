@@ -75,18 +75,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $lastname = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatar = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $banner = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-
     private ?\DateTimeInterface $updatedAt;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $lastLogin = null;
 
     #[ORM\PrePersist]
-    public function prePersistUpdatedAt() : void {
+    public function prePersistUpdatedAt(): void
+    {
         $this->updatedAt = new \DateTime();
     }
 
@@ -339,5 +345,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(string $avatar): static
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getBanner(): ?string
+    {
+        return $this->banner;
+    }
+
+    public function setBanner(string $banner): static
+    {
+        $this->banner = $banner;
+
+        return $this;
     }
 }

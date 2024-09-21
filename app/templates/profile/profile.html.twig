@@ -7,23 +7,24 @@
         <div class="w-full max-w-4xl mt-8 max-lg:mt-4 flex flex-col gap-4">
             <div class="flex flex-col bg-white rounded-xl overflow-hidden border-gray-200 border-[1px]">
                 <div class="w-full h-[15vh] bg-indigo-200 bg-cover bg-center bg-no-repeat"
-                     style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5Xd3Fc8wrXriXfoaiCnRS1QIWV8pe61C8Dd80z5GchvZUIgX9UFOHGZG24A0oLmv1r_E&usqp=CAU')">
+                     style="{{ (profile.banner is defined and profile.banner is not null )  ? "background-image: url('" ~ banner_path(profile.banner) ~ "');" : '' }}">
 
                 </div>
                 <div class="p-4">
                     <div class="flex w-full justify-between items-start">
-                        <div class="flex gap-3 items-center">
-                            {{ include('components/avatar.html.twig') }}
-                            <div class="flex flex-col">
+                        <div class="flex gap-3 items-end -ml-[10px] -mt-[65px]">
+                            <img src="{{ avatar_path(profile.avatar) }}" alt="Avatar"
+                                 class="w-[120px] h-[120px] border-white border-[6px] bg-zinc-200 rounded-full flex items-center justify-center object-cover object-center">
+                            <div class="flex flex-col mb-2">
                                 {% if (profile.name or profile.lastname) %}
                                     <h2 class="text-2xl font-bold flex gap-1">
                                         <span>{{ profile.name }}</span>
                                         <span>{{ profile.lastname }}</span>
                                     </h2>
-                                    <span class="text-gray-500 text-sm">@{{ profile.username }}</span>
                                 {% else %}
-                                    <h2 class="text-2xl font-bold">{{ profile.username }}</h2>
+                                    <h2 class="text-2xl font-bold flex gap-1">Inconnu</h2>
                                 {% endif %}
+                                <span class="text-gray-500 text-sm">@{{ profile.username }}</span>
                             </div>
                         </div>
                         {% if mine %}
@@ -103,7 +104,7 @@
                     {% endif %}
                     <div class="flex flex-col">
                         <span>Visibilité du compte</span>
-                        <span class="text-black">{% if profile.visible %}Publique{% else %}Masqué{% endif %}</span>
+                        <span class="text-black">{% if profile.visible %}Public{% else %}Masqué{% endif %}</span>
                     </div>
                     <div class="flex flex-col">
                         <span>Dernière connexion</span>
