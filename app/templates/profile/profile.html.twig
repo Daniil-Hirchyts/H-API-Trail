@@ -118,9 +118,140 @@
             </div>
             <div id="comments"
                  class="flex flex-col bg-white rounded-xl overflow-hidden border-gray-200 border-[1px] p-4">
-                <h2 class="text-2xl font-bold mb-4">Avis</h2>
-                <span class="text-gray-500">Aucun avis pour le moment</span>
+                <div class="flex justify-between">
+                    <h2 class="text-2xl font-bold mb-4">Avis</h2>
+                    {% if avgStars > 0 %}
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-gray-500 text-xs">Moyenne ({{ comments|length }} avis)</span>
+                            <div class="flex">
+                                {% for i in 1..avgStars %}
+                                    <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true"
+                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                         viewBox="0 0 22 20">
+                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                    </svg>
+                                {% endfor %}
+                                {% for i in 1..(5-avgStars) %}
+                                    <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500"
+                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         fill="currentColor" viewBox="0 0 22 20">
+                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                    </svg>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if comments|length > 0 %}
+                    <div class="flex flex-col gap-4 mt-4">
+                        {% for comment in comments %}
+                            <div class="flex gap-2">
+                                <img src="{{ avatar_path(comment.avatar) }}" alt="Avatar"
+                                     class="w-[45px] h-[45px] shrink-0 bg-zinc-200 rounded-full object-cover object-center">
+                                <div class="flex flex-col gap-2 w-full -mt-1">
+                                    <div class="flex justify-between w-full">
+                                        <a href="{{ path('app_profile_by_id', {'id': comment.sender}) }}"
+                                           class="flex flex-col">
+                                            {% if (comment.name or comment.lastname) %}
+                                                <h3 class="text-lg font-bold flex gap-1">
+                                                    <span>{{ comment.name }}</span>
+                                                    <span>{{ comment.lastname }}</span>
+                                                </h3>
+                                            {% else %}
+                                                <h3 class="text-lg font-bold flex gap-1">Inconnu</h3>
+                                            {% endif %}
+                                            <span class="text-gray-500 text-sm -mt-1">@{{ comment.username }}</span>
+                                        </a>
+                                        <div class="flex">
+                                            {% for i in 1..comment.stars %}
+                                                <svg class="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true"
+                                                     xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                     viewBox="0 0 22 20">
+                                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                                </svg>
+                                            {% endfor %}
+                                            {% for i in 1..(5-comment.stars) %}
+                                                <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500"
+                                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                     fill="currentColor" viewBox="0 0 22 20">
+                                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                                </svg>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p>{{ comment.comment }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <span class="text-gray-500">Aucun avis pour le moment</span>
+                {% endif %}
+
             </div>
+            {% if (form is defined and canComment) %}
+
+                {{ form_start(form, {'attr': {
+                    'class': 'flex flex-col bg-white border-gray-200 border-[1px] p-4 rounded-xl'
+                }}) }}
+
+                <h2 class="text-2xl font-bold mb-4">Écrire un avis</h2>
+                <div class="flex flex-col gap-1 mb-4">
+                    <span class="text-sm font-medium text-gray-900">Note <span
+                                class="text-xs text-red-500">*</span></span>
+                    <div class="flex mt-1 -ml-1">
+                        <svg class="w-6 h-6 text-yellow-300 ms-1 rating-star cursor-pointer" aria-hidden="true"
+                             xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                             viewBox="0 0 22 20">
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        </svg>
+                        {% for i in 1..4 %}
+                            <svg class="w-6 h-6 text-gray-300 ms-1 rating-star cursor-pointer" aria-hidden="true"
+                                 xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                 viewBox="0 0 22 20">
+                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                            </svg>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% include 'components/form_field.html.twig' with {
+                    'field': form.comment,
+                    'style': 'min-height: 150px;'
+                } %}
+
+                {{ form_widget(form.stars, {
+                    'attr': {
+                        'class': "hidden",
+                        'value': 1
+                    }
+                }) }}
+
+                {% include 'components/submit.html.twig' with {
+                    'field': form.submit
+                } %}
+
+                {{ form_end(form) }}
+
+            {% endif %}
         </div>
     </main>
+
+    <script>
+        const stars = document.querySelectorAll('.rating-star');
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                document.querySelector('#comment_form_stars').value = index + 1;
+                stars.forEach((s, i) => {
+                    if (i <= index) {
+                        s.classList.remove('text-gray-300');
+                        s.classList.add('text-yellow-300');
+                    } else {
+                        s.classList.remove('text-yellow-300');
+                        s.classList.add('text-gray-300');
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

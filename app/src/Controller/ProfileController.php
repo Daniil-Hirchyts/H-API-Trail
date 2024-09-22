@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\User;
+use App\Form\CommentForm;
 use App\Form\ProfileForm;
+use App\Repository\CommentRepository;
 use App\Repository\UserRepository;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +24,8 @@ class ProfileController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly Security               $security,
         private readonly UserManager            $userManager,
-        private readonly UserRepository         $userRepository
+        private readonly UserRepository         $userRepository,
+        private readonly CommentRepository      $commentRepository
     )
     {
     }
@@ -36,9 +40,15 @@ class ProfileController extends AbstractController
         }
 
         $profil = $this->userRepository->getAllInformation($user->getId());
+        $comments = $this->commentRepository->getCommentsByUser($user->getId());
+        $avgStars = $this->commentRepository->getAvgStarsByUser($user->getId());
+
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
-            'mine' => true
+            'mine' => true,
+            'comments' => $comments,
+            'avgStars' => $avgStars,
+            'canComment' => false
         ]);
     }
 
@@ -104,8 +114,8 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/{id}', name: 'app_profile_by_id', methods: ['GET'])]
-    public function profileById(int $id): Response
+    #[Route('/profile/{id}', name: 'app_profile_by_id', methods: ['GET', 'POST'])]
+    public function profileById(Request $request, int $id): Response
     {
         $profil = $this->userRepository->getAllInformation($id);
 
@@ -116,9 +126,37 @@ class ProfileController extends AbstractController
         $user = $this->security->getUser();
         $isMine = $user && $user->getId() === $id;
 
+        $comment = new Comment();
+        $form = $this->createForm(CommentForm::class, $comment);
+
+        if ($user && !$isMine) {
+            $canComment = $this->commentRepository->canComment($user->getId(), $id);
+            if ($canComment) {
+                $form->handleRequest($request);
+
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $comment->setSender($user->getId());
+                    $comment->setRecipient($id);
+
+                    $this->entityManager->persist($comment);
+                    $this->entityManager->flush();
+
+                    $this->addFlash('success', 'Commentaire ajouté avec succès.');
+                }
+            }
+        }
+
+        $comments = $this->commentRepository->getCommentsByUser($id);
+        $avgStars = $this->commentRepository->getAvgStarsByUser($id);
+        $canComment = $this->commentRepository->canComment($user->getId(), $id);
+
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
-            'mine' => $isMine
+            'mine' => $isMine,
+            'form' => $form->createView(),
+            'comments' => $comments,
+            'avgStars' => $avgStars,
+            'canComment' => $canComment
         ]);
     }
 }

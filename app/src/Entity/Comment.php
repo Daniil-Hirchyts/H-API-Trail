@@ -18,13 +18,11 @@ class Comment
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
     private ?int $sender = null;
 
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
     private ?int $recipient = null;
 
     #[ORM\Column(length: 255)]

@@ -16,28 +16,43 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
-    //    /**
-    //     * @return Comment[] Returns an array of Comment objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getCommentsByUser($userId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.id', 'c.comment', 'c.sender', 'c.stars', 'u.username', 'u.avatar', 'u.name', 'u.lastname', 'u.id AS user_id')
+            ->join('App\Entity\User', 'u', 'WITH', 'c.sender = u.id')
+            ->where('c.recipient = :recipient')
+            ->setParameter('recipient', $userId)
+            ->getQuery()
+            ->getArrayResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Comment
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function getAvgStarsByUser($userId): int
+    {
+        $avg = $this->createQueryBuilder('c')
+            ->select('AVG(c.stars) AS avg_stars')
+            ->where('c.recipient = :recipient')
+            ->setParameter('recipient', $userId)
+            ->getQuery()
+            ->getArrayResult();
+
+        return round($avg[0]['avg_stars']);
+    }
+
+    public function canComment($sender, $recipient): bool
+    {
+        if ($sender === $recipient) {
+            return false;
+        }
+        $comment = $this->createQueryBuilder('c')
+            ->select('c.id')
+            ->where('c.sender = :sender')
+            ->andWhere('c.recipient = :recipient')
+            ->setParameter('sender', $sender)
+            ->setParameter('recipient', $recipient)
+            ->getQuery()
+            ->getArrayResult();
+
+        return count($comment) === 0;
+    }
 }
