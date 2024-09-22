@@ -21,33 +21,19 @@
             </div>
 
             <div id="results" class="flex flex-col gap-4">
-                {% for card in cards %}
-                    <div class="bg-white p-4 border border-gray-200 rounded-lg">
-                        <a href="{{ path('app_profile_by_id', {'id': card.id}) }}"
-                           class="hover:underline text-center text-lg font-semibold">
-                            {{ card.username }}
-                        </a>
-                        {% if card.bio %}
-                            <p class="mt-2">{{ card.bio|default('')|slice(0, 200)|trim }}{{ card.bio|length > 200 ? '...' : '' }}</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                {% include 'components/comment_list.html.twig' with {'cards': cards} %}
             </div>
         </div>
     </main>
 
     <script>
-        let debounceTimeout; // Variable pour stocker le timeout
-
+        let debounceTimeout;
         document.getElementById('search-query').addEventListener('input', function (e) {
             const query = e.target.value;
 
-            // Effacer le timeout précédent si l'utilisateur continue de taper
             clearTimeout(debounceTimeout);
 
-            // Attendre 500ms avant d'envoyer la requête (ajuster le délai si nécessaire)
             debounceTimeout = setTimeout(() => {
-                // Envoi de la requête via fetch
                 fetch("/search", {
                     method: 'POST',
                     headers: {
@@ -56,34 +42,12 @@
                     },
                     body: JSON.stringify({query: query})
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Mise à jour des résultats
-                        const resultsDiv = document.getElementById('results');
-                        resultsDiv.innerHTML = ''; // Réinitialiser le contenu des résultats
-
-                        // Vérifier s'il y a des résultats
-                        if (data.cards && data.cards.length > 0) {
-                            data.cards.forEach(card => {
-                                const cardDiv = document.createElement('div');
-                                let bio = card.bio || ''
-                                if (bio.length > 200) {
-                                    bio = bio.slice(0, 200).trim() + '...';
-                                }
-                                cardDiv.className = 'bg-white p-4 border border-gray-200 rounded-lg';
-                                cardDiv.innerHTML = `<a href="/profile/${card.id}"
-                                   class="hover:underline text-center text-lg font-semibold">
-                                    ${card.username}
-                                </a>
-                                ${card.bio ? `<p class="mt-2">${bio}</p>` : ''}`;
-                                resultsDiv.appendChild(cardDiv);
-                            });
-                        } else {
-                            resultsDiv.innerHTML = '<p>Aucun résultat trouvé.</p>';
-                        }
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('results').innerHTML = html;
                     })
                     .catch(error => console.error('Erreur lors de la recherche:', error));
-            }, 500); // Le délai est de 500ms
+            }, 500);
         });
     </script>
 

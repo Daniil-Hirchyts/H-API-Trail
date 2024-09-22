@@ -19,7 +19,7 @@ class UserRepository extends ServiceEntityRepository
     public function getCardUsernames(): array
     {
         return $this->createQueryBuilder('u')
-            ->select('u.username, u.id, SUBSTRING(u.bio, 1, 201) AS bio')
+            ->select('u.username, u.id, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname')
             ->where('u.visible = TRUE')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
@@ -50,7 +50,7 @@ class UserRepository extends ServiceEntityRepository
     public function findBySearchQuery($query)
     {
         return $this->createQueryBuilder('u')
-            ->select('u.username, u.id, SUBSTRING(u.bio, 1, 201) AS bio')
+            ->select('u.username, u.id, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname')
             ->where('LOWER(u.username) LIKE LOWER(:query) and u.visible = TRUE')
             ->setParameter('query', '%' . strtolower($query) . '%')
             ->orderBy('u.id', 'ASC')
