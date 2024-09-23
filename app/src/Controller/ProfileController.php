@@ -148,7 +148,7 @@ class ProfileController extends AbstractController
 
         $comments = $this->commentRepository->getCommentsByUser($id);
         $avgStars = $this->commentRepository->getAvgStarsByUser($id);
-        $canComment = $this->commentRepository->canComment($user->getId(), $id);
+        $canComment = $user && $this->commentRepository->canComment($user->getId(), $id);
 
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
