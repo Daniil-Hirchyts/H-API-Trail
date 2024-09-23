@@ -20,32 +20,44 @@ function getRandomCombination() {
 }
 
 function updateUsername() {
-    const usernameField = document.getElementById('register_form_username');
+    const usernameField =  document.getElementById('register_form_username') || document.getElementById('profile_form_username');
     const usernameMessage = document.getElementById('usernameMessage');
 
     usernameField.value = getRandomCombination();
     usernameMessage.textContent = ''; // Clear the message when generating a new username
     usernameField.style.borderColor = ''; // Clear the border color
-
     checkUsername(usernameField.value); // Immediately check the new random username
 }
 
 let debounceTimeout;
+let originalUsername;
 
 document.addEventListener('DOMContentLoaded', () => {
-    const usernameField = document.getElementById('register_form_username');
-    const usernameMessage = document.getElementById('usernameMessage'); // Récupère le span
+    const usernameField = document.getElementById('register_form_username') || document.getElementById('profile_form_username');
+    const usernameMessage = document.getElementById('usernameMessage');
+
+    // Store the original username if the form is for editing the profile
+    if (usernameField.id === 'profile_form_username') {
+        originalUsername = usernameField.value;
+    }
 
     usernameField.addEventListener('input', function() {
         clearTimeout(debounceTimeout);
         const username = this.value;
 
-        if (username.length >= 1) { // Vérifie que le nom d'utilisateur est suffisamment long
+        // If the entered username is the same as the original, skip the check
+        if (username === originalUsername) {
+            usernameMessage.textContent = '';
+            usernameField.style.borderColor = '';
+            return;
+        }
+
+        if (username.length >= 1) {
             debounceTimeout = setTimeout(() => {
                 checkUsername(username);
-            }, 500); // Délai de 500ms pour éviter des requêtes excessives
+            }, 500); // Delay to prevent excessive requests
         } else {
-            usernameMessage.textContent = 'Le nom d\'utilisateur doit contenir au moins 1 caractères.';
+            usernameMessage.textContent = 'Le nom d\'utilisateur doit contenir au moins 1 caractère.';
             usernameMessage.style.color = 'red';
         }
     });
@@ -55,14 +67,14 @@ function checkUsername(username) {
     fetch(`/check_username/${encodeURIComponent(username)}`)
         .then(response => response.json())
         .then(data => {
-            const usernameField = document.getElementById('register_form_username');
-            const usernameMessage = document.getElementById('usernameMessage'); // Récupère le span
+            const usernameField = document.getElementById('register_form_username') || document.getElementById('profile_form_username');
+            const usernameMessage = document.getElementById('usernameMessage');
 
-            if (data.available === false) {  // Nom d'utilisateur déjà pris
+            if (data.available === false) {
                 usernameMessage.textContent = 'Ce nom d\'utilisateur est déjà pris.';
                 usernameMessage.style.color = 'red';
                 usernameField.style.borderColor = 'red';
-            } else {  // Nom d'utilisateur disponible
+            } else {
                 usernameMessage.textContent = 'Ce nom d\'utilisateur est disponible.';
                 usernameMessage.style.color = 'green';
                 usernameField.style.borderColor = 'green';
@@ -72,4 +84,5 @@ function checkUsername(username) {
             console.error('Erreur lors de la vérification du nom d\'utilisateur :', error);
         });
 }
+
 

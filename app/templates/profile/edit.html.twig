@@ -88,6 +88,9 @@
                     </button>
                 </div>
 
+                <!-- Ajoute un span vide ici pour les messages -->
+                <span id="usernameMessage" class="text-sm"></span>
+
                 <div class="flex gap-2 w-full">
                     {% include 'components/form_field.html.twig' with {
                         'field': form.name
@@ -165,11 +168,6 @@
     </main>
 
     <script>
-        function updateUsername() {
-            const username = document.getElementById('profile_form_username')
-            username.value = getRandomCombination()
-        }
-
         function loadFile(event, id) {
             console.log(id)
             const file = event.target.files[0];

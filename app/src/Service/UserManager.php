@@ -47,7 +47,7 @@ class UserManager implements UserManagerInterface
                 $id = $this->convertToWebp($file, $this->avatarFolder, $user->getAvatar());
                 $user->setAvatar($id);
             } catch (\Exception $e) {
-                throw new \Exception('An error occurred while converting the image.');
+                throw new \Exception('An error occurred while processing the image.');
             }
         }
     }
@@ -63,26 +63,40 @@ class UserManager implements UserManagerInterface
         $fileName = $id . '.webp';
         $webpPath = $destination . '/' . $fileName;
 
-        $image = match ($extension) {
-            'jpeg', 'jpg' => imagecreatefromjpeg($file->getPathname()),
-            'png' => imagecreatefrompng($file->getPathname()),
-            default => throw new \Exception('Unsupported image type.'),
-        };
+        if ($extension === 'webp') {
+            $file->move($destination, $fileName);
+        } else {
+            $image = match ($extension) {
+                'jpeg', 'jpg' => imagecreatefromjpeg($file->getPathname()),
+                'png' => imagecreatefrompng($file->getPathname()),
+                default => throw new \Exception('Unsupported image type.'),
+            };
 
-        if ($image !== null) {
-            imagewebp($image, $webpPath);
-            imagedestroy($image);
+            if ($image !== null) {
+                imagewebp($image, $webpPath);
+                imagedestroy($image);
+            }
         }
 
         if ($prevId !== null) {
-            $prevPath = $destination . '/' . $prevId . '.webp';
-            if (file_exists($prevPath)) {
-                unlink($prevPath);
-            }
+            $this->deletePreviousImage($prevId, $destination);
         }
 
         return $id;
     }
+
+    private function deletePreviousImage(string $prevId, string $destination): void
+    {
+        $extensions = ['webp', 'jpeg', 'jpg', 'png'];
+
+        foreach ($extensions as $extension) {
+            $prevPath = $destination . '/' . $prevId . '.' . $extension;
+            if (file_exists($prevPath)) {
+                unlink($prevPath);
+            }
+        }
+    }
+
 
     /**
      * @throws \Exception

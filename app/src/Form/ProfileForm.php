@@ -58,8 +58,8 @@ class ProfileForm extends AbstractType
                     new File(
                         maxSize: '20M',
                         maxSizeMessage: 'Le fichier est trop lourd',
-                        extensions: ['jpg', 'jpeg', 'png'],
-                        extensionsMessage: 'Le fichier doit être une image (jpg, jpeg, png)'
+                        extensions: ['jpg', 'jpeg', 'png', 'webp'],
+                        extensionsMessage: 'Le fichier doit être une image (jpg, jpeg, png, webp)'
                     )
                 ]
             ])
@@ -73,8 +73,8 @@ class ProfileForm extends AbstractType
                     new File(
                         maxSize: '20M',
                         maxSizeMessage: 'Le fichier est trop lourd',
-                        extensions: ['jpg', 'jpeg', 'png'],
-                        extensionsMessage: 'Le fichier doit être une image (jpg, pjeg, png)'
+                        extensions: ['jpg', 'jpeg', 'png', 'webp'],
+                        extensionsMessage: 'Le fichier doit être une image (jpg, pjeg, png, webp)'
                     )
                 ]
             ])
