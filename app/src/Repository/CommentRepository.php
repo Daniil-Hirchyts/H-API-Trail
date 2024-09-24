@@ -16,23 +16,23 @@ class CommentRepository extends ServiceEntityRepository
         parent::__construct($registry, Comment::class);
     }
 
-    public function getCommentsByUser($userId): array
+    public function getCommentsByUser($code): array
     {
         return $this->createQueryBuilder('c')
             ->select('c.id', 'c.comment', 'c.sender', 'c.stars', 'u.username', 'u.avatar', 'u.name', 'u.lastname', 'u.id AS user_id')
-            ->join('App\Entity\User', 'u', 'WITH', 'c.sender = u.id')
+            ->join('App\Entity\User', 'u', 'WITH', 'c.sender = u.code')
             ->where('c.recipient = :recipient')
-            ->setParameter('recipient', $userId)
+            ->setParameter('recipient', $code)
             ->getQuery()
             ->getArrayResult();
     }
 
-    public function getAvgStarsByUser($userId): int
+    public function getAvgStarsByUser($code): int
     {
         $avg = $this->createQueryBuilder('c')
             ->select('AVG(c.stars) AS avg_stars')
             ->where('c.recipient = :recipient')
-            ->setParameter('recipient', $userId)
+            ->setParameter('recipient', $code)
             ->getQuery()
             ->getArrayResult();
 

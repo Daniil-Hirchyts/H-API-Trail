@@ -117,29 +117,29 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/{id}', name: 'app_profile_by_id', methods: ['GET', 'POST'])]
-    public function profileById(Request $request, int $id): Response
+    #[Route('/profile/{code}', name: 'app_profile_by_code', methods: ['GET', 'POST'])]
+    public function profileById(Request $request, string $code): Response
     {
-        $profil = $this->userRepository->getAllInformation($id);
+        $profil = $this->userRepository->getAllInformation($code);
 
         if (count($profil) == 0) {
             return $this->render('not-found.html.twig');
         }
 
         $user = $this->security->getUser();
-        $isMine = $user && $user->getId() === $id;
+        $isMine = $user && $user->getCode() === $code;
 
         $comment = new Comment();
         $form = $this->createForm(CommentForm::class, $comment);
 
         if ($user && !$isMine) {
-            $canComment = $this->commentRepository->canComment($user->getId(), $id);
+            $canComment = $this->commentRepository->canComment($user->getCode(), $code);
             if ($canComment) {
                 $form->handleRequest($request);
 
                 if ($form->isSubmitted() && $form->isValid()) {
-                    $comment->setSender($user->getId());
-                    $comment->setRecipient($id);
+                    $comment->setSender($user->getCode());
+                    $comment->setRecipient($code);
 
                     $this->entityManager->persist($comment);
                     $this->entityManager->flush();
@@ -149,9 +149,9 @@ class ProfileController extends AbstractController
             }
         }
 
-        $comments = $this->commentRepository->getCommentsByUser($id);
-        $avgStars = $this->commentRepository->getAvgStarsByUser($id);
-        $canComment = $user && $this->commentRepository->canComment($user->getId(), $id);
+        $comments = $this->commentRepository->getCommentsByUser($code);
+        $avgStars = $this->commentRepository->getAvgStarsByUser($code);
+        $canComment = $user && $this->commentRepository->canComment($user->getCode(), $code);
 
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
@@ -164,10 +164,10 @@ class ProfileController extends AbstractController
     }
 
 
-    #[Route('/api/profile/{id}', name: 'api_profile_by_id', methods: ['GET'])]
-    public function getjSONProfile($id): JsonResponse
+    #[Route('/api/profile/{code}', name: 'api_profile_by_id', methods: ['GET'])]
+    public function getjSONProfile($code): JsonResponse
     {
-        $profil = $this->userRepository->getAllInformation($id);
+        $profil = $this->userRepository->getAllInformation($code);
 
         if (count($profil) == 0) {
             return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);

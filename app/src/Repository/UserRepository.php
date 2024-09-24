@@ -18,7 +18,7 @@ class UserRepository extends ServiceEntityRepository
 
     public function getUserByUsernameOrEmail($username, $email){
         return $this->createQueryBuilder('u')
-            ->select('u.id')
+            ->select('u.code')
             ->where('u.username = :username OR u.email = :email')
             ->setParameter('username', $username)
             ->setParameter('email', $email)
@@ -29,19 +29,19 @@ class UserRepository extends ServiceEntityRepository
     public function getCardUsernames(): array
     {
         return $this->createQueryBuilder('u')
-            ->select('u.username, u.id, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname')
+            ->select('u.username,u.code, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname')
             ->where('u.visible = TRUE')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->getArrayResult();
     }
 
-    public function getAllInformation($userId): array
+    public function getAllInformation($code): array
     {
         return $this->createQueryBuilder('u')
-            ->select('u.username, u.email, u.avatar, u.banner, u.visible, u.name, u.lastname, u.bio, u.phone, u.address, u.country, u.zipCode, u.city, u.website, u.job, u.createdAt, u.updatedAt, u.lastLogin')
-            ->where('u.id = :userId')
-            ->setParameter('userId', $userId)
+            ->select('u.username,u.code, u.email, u.avatar, u.banner, u.visible, u.name, u.lastname, u.bio, u.phone, u.address, u.country, u.zipCode, u.city, u.website, u.job, u.createdAt, u.updatedAt, u.lastLogin')
+            ->where('u.code = :code')
+            ->setParameter('code', $code)
             ->getQuery()
             ->getArrayResult();
     }
@@ -49,7 +49,7 @@ class UserRepository extends ServiceEntityRepository
     public function getUserByUsername($username): array
     {
         return $this->createQueryBuilder('u')
-            ->select('u.id')
+            ->select('u.code')
             ->where('u.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
@@ -59,7 +59,7 @@ class UserRepository extends ServiceEntityRepository
     public function getUserByCode($code): array
     {
         return $this->createQueryBuilder('u')
-            ->select('u.id')
+            ->select('u.code')
             ->where('u.code = :code')
             ->setParameter('code', $code)
             ->getQuery()
@@ -71,7 +71,7 @@ class UserRepository extends ServiceEntityRepository
     public function findBySearchQuery($query)
     {
         return $this->createQueryBuilder('u')
-            ->select('u.username, u.id, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname')
+            ->select('u.username, u.code, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname')
             ->where('LOWER(u.username) LIKE LOWER(:query) and u.visible = TRUE')
             ->setParameter('query', '%' . strtolower($query) . '%')
             ->orderBy('u.id', 'ASC')

@@ -18,12 +18,12 @@ class Comment
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?int $sender = null;
+    private ?string $sender = null;
 
     #[ORM\Column]
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?int $recipient = null;
+    private ?string $recipient = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
@@ -43,7 +43,7 @@ class Comment
         return $this->sender;
     }
 
-    public function setSender(int $sender): static
+    public function setSender(string $sender): static
     {
         $this->sender = $sender;
 

@@ -2,7 +2,7 @@
     <p class="text-gray-500">Aucun résultat</p>
 {% else %}
     {% for card in cards %}
-        <a href="{{ path('app_profile_by_id', {'id': card.id}) }}"
+        <a href="{{ path('app_profile_by_code', {'code': card.code}) }}"
            class="bg-white p-4 border border-gray-200 rounded-lg">
             <div class="flex gap-2 items-center">
                 <img src="{{ avatar_path(card.avatar) }}" alt="Avatar"
