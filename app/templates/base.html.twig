@@ -162,6 +162,8 @@
         }, 500);
     }
 
+    {% if app.user %}
+
     const dropdownTrigger = document.getElementById('hs-dropdown-custom-trigger');
     const dropdownMenu = document.querySelector('.hs-dropdown-menu');
     const profileArrow = document.getElementById('profile-arrow');
@@ -184,6 +186,7 @@
             profileArrow.classList.remove('rotate-180');
         }
     });
+    {% endif %}
 </script>
 </body>
 </html>

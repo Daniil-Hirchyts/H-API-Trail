@@ -51,6 +51,7 @@ class AuthController extends AbstractController
 
                     $user->setLastLogin(new \DateTime());
                     $user->setCreatedAt(new \DateTime());
+                    $user->setUpdatedAt(new \DateTime());
                     $entityManager->persist($user);
                     $entityManager->flush();
                     $this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
@@ -82,6 +83,20 @@ class AuthController extends AbstractController
     public function checkUsername($username): JsonResponse
     {
         $user = $this->userRepository->getUserByUsername($username);
+
+        if (!empty($user)) {
+            return $this->json(['available' => false]);
+        }
+        return $this->json(['available' => true]);
+    }
+
+    #[Route('/check_code/{code}', name: 'check_code', methods: ['GET'])]
+    public function checkCode($code){
+        if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]+$/', $code)) {
+            return $this->json(['available' => false]);
+        }
+
+        $user = $this->userRepository->getUserByCode($code);
 
         if (!empty($user)) {
             return $this->json(['available' => false]);

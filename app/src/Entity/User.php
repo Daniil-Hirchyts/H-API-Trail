@@ -13,9 +13,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[UniqueEntity('username', message: 'Ce username est déjà utilisé!')]
 #[UniqueEntity('email', message: 'Cette adresse email est déjà utilisée!')]
+#[UniqueEntity('code', message: 'Ce code est déjà utilisé!')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_LOGIN', fields: ['username'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_CODE', fields: ['code'])]
 #[ORM\Table(name: '`user`')]
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -28,6 +30,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
     private ?string $username = null;
+
+    #[ORM\Column(length: 20)]
+    #[Assert\NotNull]
+    private ?string $code = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull]
@@ -94,9 +100,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PreUpdate]
     public function preUpdateUpdatedAt(PreUpdateEventArgs $event): void
     {
-        if (!$event->hasChangedField('lastLogin')) {
-            $this->updatedAt = new \DateTime();
+        if ($event->hasChangedField('lastLogin') && count($event->getEntityChangeSet()) === 1) {
+            return;
         }
+        $this->updatedAt = new \DateTime();
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): void
+    {
+        $this->code = $code;
     }
 
     public function getId(): ?int

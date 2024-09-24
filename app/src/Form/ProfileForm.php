@@ -48,6 +48,20 @@ class ProfileForm extends AbstractType
                     ]),
                 ],
             ])
+            ->add('code', TextType::class, [
+                'label' => 'Code',
+                'attr' => [
+                    'minlength' => 20,
+                    'maxlength' => 20,
+                    'pattern' => '^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{20}$',
+                ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{20}$/',
+                        'message' => 'Le code doit contenir au moins une lettre, un chiffre et ne doit pas contenir de caractères spéciaux.'
+                    ])
+                ]
+            ])
             ->add('avatar', FileType::class, [
                 "mapped" => false,
                 'required' => false,
