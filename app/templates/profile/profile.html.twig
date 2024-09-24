@@ -36,6 +36,7 @@
                                 </svg>
                                 Modifier</a>
                         {% else %}
+                            {% if canComment %}
                             <a href="#comments" class="text-indigo-600 flex gap-2 items-center hover:underline">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
                                      fill="currentColor">
@@ -43,6 +44,7 @@
                                 </svg>
                                 Écrire un avis
                             </a>
+                            {% endif %}
                         {% endif %}
                     </div>
                     <p class="mt-4">{{ profile.bio }}</p>
@@ -152,7 +154,7 @@
                                      class="w-[45px] h-[45px] shrink-0 bg-zinc-200 rounded-full object-cover object-center">
                                 <div class="flex flex-col gap-2 w-full -mt-1">
                                     <div class="flex justify-between w-full">
-                                        <a href="{{ path('app_profile_by_id', {'id': comment.sender}) }}"
+                                        <a href="{{ path('app_profile_by_code', {'code': comment.sender}) }}"
                                            class="flex flex-col">
                                             {% if (comment.name or comment.lastname) %}
                                                 <h3 class="text-lg font-bold flex gap-1">

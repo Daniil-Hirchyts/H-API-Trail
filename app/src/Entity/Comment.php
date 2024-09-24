@@ -55,7 +55,7 @@ class Comment
         return $this->recipient;
     }
 
-    public function setRecipient(int $recipient): static
+    public function setRecipient(string $recipient): static
     {
         $this->recipient = $recipient;
 

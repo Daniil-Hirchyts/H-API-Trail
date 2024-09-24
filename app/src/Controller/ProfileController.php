@@ -41,9 +41,10 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
-        $profil = $this->userRepository->getAllInformation($user->getId());
-        $comments = $this->commentRepository->getCommentsByUser($user->getId());
-        $avgStars = $this->commentRepository->getAvgStarsByUser($user->getId());
+        $profil = $this->userRepository->getAllInformation($user->getCode());
+        $comments = $this->commentRepository->getCommentsByUser($user->getCode());
+        $avgStars = $this->commentRepository->getAvgStarsByUser($user->getCode());
+
 
         return $this->render('profile/profile.html.twig', [
             'profile' => $profil[0],
