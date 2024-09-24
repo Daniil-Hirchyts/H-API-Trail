@@ -10,9 +10,11 @@ use App\Repository\CommentRepository;
 use App\Repository\UserRepository;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -159,5 +161,18 @@ class ProfileController extends AbstractController
             'avgStars' => $avgStars,
             'canComment' => $canComment
         ]);
+    }
+
+
+    #[Route('/api/profile/{id}', name: 'api_profile_by_id', methods: ['GET'])]
+    public function getjSONProfile($id): JsonResponse
+    {
+        $profil = $this->userRepository->getAllInformation($id);
+
+        if (count($profil) == 0) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($profil[0]);
     }
 }
