@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -90,10 +91,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $lastLogin = null;
 
-    #[ORM\PrePersist]
-    public function prePersistUpdatedAt(): void
+    #[ORM\PreUpdate]
+    public function preUpdateUpdatedAt(PreUpdateEventArgs $event): void
     {
-        $this->updatedAt = new \DateTime();
+        if (!$event->hasChangedField('lastLogin')) {
+            $this->updatedAt = new \DateTime();
+        }
     }
 
     public function getId(): ?int

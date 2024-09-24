@@ -85,7 +85,7 @@ class ProfileController extends AbstractController
                     );
                 }
 
-                $user->setUpdatedAt(new \DateTime());
+                //$user->setUpdatedAt(new \DateTime());
 
                 try {
                     $this->userManager->saveAvatar($user, $avatar);
@@ -99,6 +99,7 @@ class ProfileController extends AbstractController
                     $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de votre bannière.');
                 }
 
+                $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
                 $this->addFlash('success', 'Profil mis à jour avec succès.');
