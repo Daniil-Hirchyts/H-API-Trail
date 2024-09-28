@@ -18,3 +18,8 @@ En mode prod :
 ```
 
 > L'image dockerfile du projet execute les migrations dans le script entrypoint.sh
+
+## Mode maintenance
+
+Pour activer le mode maintenance, il suffit de mettre `site_in_maintenance` à `true` dans le fichier
+`/app/config/services.yaml`.

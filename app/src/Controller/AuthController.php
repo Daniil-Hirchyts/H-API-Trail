@@ -54,7 +54,7 @@ class AuthController extends AbstractController
                     $user->setUpdatedAt(new \DateTime());
                     $entityManager->persist($user);
                     $entityManager->flush();
-                    $this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
+                    $this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur LDS");
                     return $this->redirectToRoute('login');
                 }
             }

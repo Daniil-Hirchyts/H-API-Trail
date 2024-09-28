@@ -8,6 +8,7 @@ parameters:
   avatar_base_url: '/img/avatar'
   banner_folder: '%kernel.project_dir%/public/img/banner'
   banner_base_url: '/img/banner'
+  site_in_maintenance: false
 
 services:
   # default configuration for services in *this* file
