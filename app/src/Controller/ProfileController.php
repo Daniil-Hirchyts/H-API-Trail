@@ -126,7 +126,7 @@ class ProfileController extends AbstractController
         $profil = $this->userRepository->getAllInformation($code);
 
         if (count($profil) == 0) {
-            return $this->render('not-found.html.twig');
+            throw $this->createNotFoundException('User not found');
         }
 
         $user = $this->security->getUser();
@@ -197,4 +197,24 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
+    #[Route('/account/delete/{code}', name: 'app_admin_account_delete')]
+    public function adminDeleteAccount(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user || !$this->security->isAdmin()) {
+            throw $this->createAccessDeniedException('You are not allowed to access this page.');
+        }
+
+        $userToDelete = $this->userRepository->findOneBy(['code' => $request->get('code')]);
+
+        if (!$userToDelete) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $entityManager->remove($userToDelete);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_home');
+    }
 }

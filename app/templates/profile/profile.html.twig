@@ -36,15 +36,27 @@
                                 </svg>
                                 Modifier</a>
                         {% else %}
-                            {% if canComment %}
-                            <a href="#comments" class="text-indigo-600 flex gap-2 items-center hover:underline">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
-                                     fill="currentColor">
-                                    <path d="M14.45 19L12 22.5L9.55 19H3C2.73478 19 2.48043 18.8946 2.29289 18.7071C2.10536 18.5196 2 18.2652 2 18V4C2 3.73478 2.10536 3.48043 2.29289 3.29289C2.48043 3.10536 2.73478 3 3 3H21C21.2652 3 21.5196 3.10536 21.7071 3.29289C21.8946 3.48043 22 3.73478 22 4V18C22 18.2652 21.8946 18.5196 21.7071 18.7071C21.5196 18.8946 21.2652 19 21 19H14.45ZM13.409 17H20V5H4V17H10.591L12 19.012L13.409 17Z"></path>
-                                </svg>
-                                Écrire un avis
-                            </a>
-                            {% endif %}
+                            <div class="flex items-center gap-4">
+                                {% if canComment %}
+                                    <a href="#comments" class="text-indigo-600 flex gap-2 items-center hover:underline">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16"
+                                             height="16"
+                                             fill="currentColor">
+                                            <path d="M14.45 19L12 22.5L9.55 19H3C2.73478 19 2.48043 18.8946 2.29289 18.7071C2.10536 18.5196 2 18.2652 2 18V4C2 3.73478 2.10536 3.48043 2.29289 3.29289C2.48043 3.10536 2.73478 3 3 3H21C21.2652 3 21.5196 3.10536 21.7071 3.29289C21.8946 3.48043 22 3.73478 22 4V18C22 18.2652 21.8946 18.5196 21.7071 18.7071C21.5196 18.8946 21.2652 19 21 19H14.45ZM13.409 17H20V5H4V17H10.591L12 19.012L13.409 17Z"></path>
+                                        </svg>
+                                        Écrire un avis
+                                    </a>
+                                {% endif %}
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('app_admin_account_delete', {'code': profile.code}) }}"
+                                       class="flex justify-center items-center gap-2 text-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16"
+                                             height="16" fill="currentColor">
+                                            <path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM9 11V17H11V11H9ZM13 11V17H15V11H13ZM9 4V6H15V4H9Z"></path>
+                                        </svg>
+                                        Supprimer</a>
+                                {% endif %}
+                            </div>
                         {% endif %}
                     </div>
                     <p class="mt-4">{{ profile.bio }}</p>
@@ -134,13 +146,13 @@
                                     </svg>
                                 {% endfor %}
                                 {% if avgStars < 5 %}
-                                {% for i in 1..(5-avgStars) %}
-                                    <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500"
-                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                         fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                    </svg>
-                                {% endfor %}
+                                    {% for i in 1..(5-avgStars) %}
+                                        <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500"
+                                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                             fill="currentColor" viewBox="0 0 22 20">
+                                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                        </svg>
+                                    {% endfor %}
                                 {% endif %}
                             </div>
                         </div>
@@ -175,13 +187,13 @@
                                                 </svg>
                                             {% endfor %}
                                             {% if comment.stars < 5 %}
-                                            {% for i in 1..(5-comment.stars) %}
-                                                <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500"
-                                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                     fill="currentColor" viewBox="0 0 22 20">
-                                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                                </svg>
-                                            {% endfor %}
+                                                {% for i in 1..(5-comment.stars) %}
+                                                    <svg class="w-4 h-4 ms-1 text-gray-300 dark:text-gray-500"
+                                                         aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                                         fill="currentColor" viewBox="0 0 22 20">
+                                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                                                    </svg>
+                                                {% endfor %}
                                             {% endif %}
                                         </div>
                                     </div>

@@ -16,7 +16,7 @@ function getRandomCombination() {
     const word1 = words[Math.floor(Math.random() * words.length)];
     const word2 = words[Math.floor(Math.random() * words.length)];
     const word3 = words[Math.floor(Math.random() * words.length)];
-    return `${word1}-${word2}-${word3}`;
+    return `${word1}-${word2}-${word3}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
 function getRandomCodeCombination() {
