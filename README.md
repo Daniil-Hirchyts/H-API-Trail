@@ -23,3 +23,13 @@ En mode prod :
 
 Pour activer le mode maintenance, il suffit de mettre `site_in_maintenance` à `true` dans le fichier
 `/app/config/services.yaml`.
+
+## Créer un utilisateur depuis la console
+
+Exécuter la commande suivante dans le docker :
+
+```bash
+php bin/console app:create-user
+```
+
+La commande permet de créer un compte administrateur.
