@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Random\RandomException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,9 +39,13 @@ class CreateUserCommand extends Command
             ->addArgument('username', InputArgument::OPTIONAL, 'The username of the user.')
             ->addArgument('email', InputArgument::OPTIONAL, 'The email of the user.')
             ->addArgument('password', InputArgument::OPTIONAL, 'The password of the user.')
-            ->addArgument('visible', InputArgument::OPTIONAL, 'The visibility of the user.');
+            ->addArgument('visible', InputArgument::OPTIONAL, 'The visibility of the user.')
+            ->addArgument('code', InputArgument::OPTIONAL, 'The code of the user.');
     }
 
+    /**
+     * @throws RandomException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $helper = $this->getHelper('question');
@@ -69,14 +74,38 @@ class CreateUserCommand extends Command
             $visible = $helper->ask($input, $output, $question);
         }
 
+        $code = $input->getArgument('code');
+        if (!$code) {
+            $question = new Question('Please enter the code (or leave blank to generate one): ');
+            $code = $helper->ask($input, $output, $question);
+            if (!$code) {
+                $code = $this->generateCode();
+            }
+        }
+
         // Validate arguments
-        if (!is_string($username) || !is_string($email) || !is_string($password) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $output->writeln('Invalid input types for username, email, or password.');
+        if (!preg_match('/^[a-zA-Z0-9_-]{3,30}$/', $username)) {
+            $output->writeln('Invalid username. The username must be 3-30 characters long and can contain letters, numbers, underscores, and hyphens.');
+            return Command::FAILURE;
+        }
+
+        if (!preg_match('/^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$/', $email)) {
+            $output->writeln('Invalid email format.');
+            return Command::FAILURE;
+        }
+
+        if (!preg_match('#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,30}$#', $password)) {
+            $output->writeln('Invalid password. The password must be 8-30 characters long and contain at least one uppercase letter, one lowercase letter, and one digit.');
             return Command::FAILURE;
         }
 
         if (!in_array($visible, ['true', 'false'], true)) {
             $output->writeln('Invalid input type for visible. It should be "true" or "false".');
+            return Command::FAILURE;
+        }
+
+        if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{20}$/', $code)) {
+            $output->writeln('Invalid code. The code must contain at least one letter, one digit, and be 20 characters long.');
             return Command::FAILURE;
         }
 
@@ -102,6 +131,7 @@ class CreateUserCommand extends Command
         $user->setUpdatedAt(new \DateTime());
         $user->setUsername($username);
         $user->setEmail($email);
+        $user->setCode($code);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -109,5 +139,22 @@ class CreateUserCommand extends Command
         $output->writeln('User successfully created!');
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @throws RandomException
+     */
+    private function generateCode(): string
+    {
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $code = '';
+        for ($i = 0; $i < 20; $i++) {
+            $code .= $characters[random_int(0, strlen($characters) - 1)];
+        }
+        // Ensure the code contains at least one letter and one digit
+        if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{20}$/', $code)) {
+            return $this->generateCode();
+        }
+        return $code;
     }
 }
