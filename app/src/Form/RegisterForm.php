@@ -27,6 +27,12 @@ class RegisterForm extends AbstractType
                     'minlength' => 3,
                     'maxlength' => 30,
                 ],
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^[a-zA-Z0-9_-]{3,30}$/',
+                        'message' => 'Le nom d\'utilisateur doit contenir uniquement des lettres, des chiffres, des tirets et des underscores.'
+                    ]),
+                ],
             ])
             ->add('code', TextType::class, [
                 'label' => 'Code',
