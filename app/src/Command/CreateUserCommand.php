@@ -79,7 +79,17 @@ class CreateUserCommand extends Command
             $question = new Question('Please enter the code (or leave blank to generate one): ');
             $code = $helper->ask($input, $output, $question);
             if (!$code) {
-                $code = $this->generateCode();
+                $code = $this->generateUniqueCode();
+            }
+        } else {
+            if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{20}$/', $code)) {
+                $output->writeln('Invalid code. The code must contain at least one letter, one digit, and be 20 characters long.');
+                return Command::FAILURE;
+            }
+
+            if ($this->userRepository->findOneBy(['code' => $code])) {
+                $output->writeln('The code already exists.');
+                return Command::FAILURE;
             }
         }
 
@@ -101,11 +111,6 @@ class CreateUserCommand extends Command
 
         if (!in_array($visible, ['true', 'false'], true)) {
             $output->writeln('Invalid input type for visible. It should be "true" or "false".');
-            return Command::FAILURE;
-        }
-
-        if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{20}$/', $code)) {
-            $output->writeln('Invalid code. The code must contain at least one letter, one digit, and be 20 characters long.');
             return Command::FAILURE;
         }
 
@@ -139,6 +144,17 @@ class CreateUserCommand extends Command
         $output->writeln('User successfully created!');
 
         return Command::SUCCESS;
+    }
+    /**
+     * @throws RandomException
+     */
+    private function generateUniqueCode(): string
+    {
+        do {
+            $code = $this->generateCode();
+        } while (!empty($this->userRepository->getUserByCode($code)));
+
+        return $code;
     }
 
     /**
