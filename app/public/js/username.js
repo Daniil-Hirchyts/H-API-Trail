@@ -44,7 +44,7 @@ function getRandomCodeCombination() {
 }
 
 function updateUsername() {
-    const usernameField =  document.getElementById('register_form_username') || document.getElementById('profile_form_username');
+    const usernameField = document.getElementById('register_form_username') || document.getElementById('profile_form_username');
     const usernameMessage = document.getElementById('usernameMessage');
 
     usernameField.value = getRandomCombination();
@@ -57,8 +57,6 @@ function updateCode() {
     const codeField = document.getElementById('register_form_code') || document.getElementById('profile_form_code');
     const codeMessage = document.getElementById('codeMessage');
 
-    console.log(codeField)
-    console.log(getRandomCodeCombination())
     codeField.value = getRandomCodeCombination();
     codeMessage.textContent = ''; // Clear the message when generating a new code
     codeField.style.borderColor = ''; // Clear the border color

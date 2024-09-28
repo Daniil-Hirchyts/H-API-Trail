@@ -3,7 +3,8 @@
 {% block title %}Modifier le Profil{% endblock %}
 
 {% block scripts %}
-    <script src="/js/username.js"></script>
+    <script src="{{ asset('js/username.js') }}"></script>
+    <script src="{{ asset('js/password.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -169,12 +170,12 @@
                 <div class="border-t-[1px] border-gray-200 w-full my-4"></div>
                 <h2 class="text-lg font-bold">Mot de passe</h2>
 
-                {% include 'components/form_field.html.twig' with {
+                {% include 'components/password_input.html.twig' with {
                     'field': form.password,
                     'help_text': 'Laissez vide si vous ne souhaitez pas changer de mot de passe'
                 } %}
 
-                {% include 'components/form_field.html.twig' with {
+                {% include 'components/password_input.html.twig' with {
                     'field': form.confirmPassword,
                     'help_text': 'Confirmez le nouveau mot de passe si modifié'
                 } %}
@@ -187,7 +188,8 @@
         <div class="max-w-4xl w-full bg-white rounded-xl overflow-hidden border-gray-200 border-[1px] p-6 mt-8 mx-auto">
             <h2 class="text-xl font-bold mb-3 text-red-600">Supprimer le compte</h2>
             <p class="mb-4 text-gray-700">
-                Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront supprimées.
+                Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données
+                seront supprimées.
             </p>
             <form action="{{ path('app_account_delete') }}" method="post">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
@@ -203,8 +205,6 @@
                 </button>
             </form>
         </div>
-
-
 
 
     </main>

@@ -4,6 +4,7 @@
 
 {% block scripts %}
     <script src="{{ asset('js/username.js') }}"></script>
+    <script src="{{ asset('js/password.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -57,12 +58,20 @@
                     'required': true
                 } %}
 
-                {% include 'components/form_field.html.twig' with {
+                {% include 'components/password_input.html.twig' with {
                     'field': form.password,
                     'required': true
                 } %}
 
-                {% include 'components/form_field.html.twig' with {
+                <div id="requirements" class="text-red-400" style="display: none">
+                    <p id="length">- Entre 8 et 20 caractères</p>
+                    <p id="uppercase">- Au moins une lettre majuscule</p>
+                    <p id="lowercase">- Au moins une lettre minuscule</p>
+                    <p id="number">- Au moins un chiffre</p>
+                    <p id="special">- Au moins un caractère spécial</p>
+                </div>
+
+                {% include 'components/password_input.html.twig' with {
                     'field': form.confirmPassword,
                     'required': true
                 } %}
@@ -86,5 +95,33 @@
     <script>
         updateUsername();
         updateCode()
+
+        const passwordInput = document.getElementById('register_form_password');
+        const requirementsDiv = document.getElementById('requirements');
+        const uppercaseReq = document.getElementById('uppercase');
+        const lowercaseReq = document.getElementById('lowercase');
+        const numberReq = document.getElementById('number');
+        const specialReq = document.getElementById('special');
+        const lengthReq = document.getElementById('length');
+
+        // Regex pour chaque critère
+        const uppercasePattern = /[A-Z]/;
+        const lowercasePattern = /[a-z]/;
+        const numberPattern = /[0-9]/;
+        const specialPattern = /[!@#$%^&*(),.?":{}|<>]/;
+
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            if (password) {
+                requirementsDiv.style.display = 'block';
+                uppercaseReq.classList.toggle('text-green-400', uppercasePattern.test(password));
+                lowercaseReq.classList.toggle('text-green-400', lowercasePattern.test(password));
+                numberReq.classList.toggle('text-green-400', numberPattern.test(password));
+                specialReq.classList.toggle('text-green-400', specialPattern.test(password));
+                lengthReq.classList.toggle('text-green-400', password.length >= 8 && password.length <= 20);
+            } else {
+                requirementsDiv.style.display = 'none';
+            }
+        });
     </script>
 {% endblock %}

@@ -55,7 +55,7 @@ class AuthController extends AbstractController
                     $entityManager->persist($user);
                     $entityManager->flush();
                     $this->flashMessageHelper->addFormSuccessAsFlash("Bienvenue sur the Feed");
-                    return $this->redirectToRoute('app_home');
+                    return $this->redirectToRoute('login');
                 }
             }
         }
@@ -91,7 +91,8 @@ class AuthController extends AbstractController
     }
 
     #[Route('/check_code/{code}', name: 'check_code', methods: ['GET'])]
-    public function checkCode($code){
+    public function checkCode($code)
+    {
         if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]+$/', $code)) {
             return $this->json(['available' => false]);
         }
