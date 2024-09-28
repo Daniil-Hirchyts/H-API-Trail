@@ -10,7 +10,6 @@ use App\Repository\CommentRepository;
 use App\Repository\UserRepository;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormError;
@@ -18,6 +17,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ProfileController extends AbstractController
@@ -27,7 +27,9 @@ class ProfileController extends AbstractController
         private readonly Security               $security,
         private readonly UserManager            $userManager,
         private readonly UserRepository         $userRepository,
-        private readonly CommentRepository      $commentRepository
+        private readonly CommentRepository      $commentRepository,
+        private readonly TokenStorageInterface  $tokenStorage
+
     )
     {
     }
@@ -176,4 +178,23 @@ class ProfileController extends AbstractController
 
         return new JsonResponse($profil[0]);
     }
+
+    #[Route('/account/delete', name: 'app_account_delete', methods: ['POST'])]
+    public function deleteAccount(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        if (!$this->isCsrfTokenValid('delete_account', $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        $this->tokenStorage->setToken(null);
+        $request->getSession()->invalidate();
+
+        return $this->redirectToRoute('app_home');
+    }
+
 }
