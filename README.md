@@ -2,22 +2,19 @@
 
 ## Initialiser le projet
 
+> Le lancement du server peut être un peu long car il faut attendre que la base de données soit healthy et que
+> l'entrypoint est fini de s'exécuter
+
 En mode dev :
 
 ```bash
-./build.sh
-```
-
-Puis soit dans docker, soit en local (dans le dossier /app) :
-
-```bash
-npm run watch
+./run.sh
 ```
 
 En mode prod :
 
 ```bash
-./build.sh prod
+./run.sh prod
 ```
 
 > L'image dockerfile du projet execute les migrations dans le script entrypoint.sh
