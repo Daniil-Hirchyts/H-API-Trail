@@ -1,0 +1,26 @@
+version: "1.0.0"
+name: apiTrail-container
+services:
+  server:
+    build:
+      context : .
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+      - 5173:5173
+    volumes:
+      - ./shared/public_html:/var/www/html
+      - ./shared/workspace:/root/workspace
+    depends_on:
+      - db
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+    volumes:
+      - dbdata:/var/lib/mysql
+volumes:
+  dbdata:
