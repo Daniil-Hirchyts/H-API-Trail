@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UtilisateursRepository;
@@ -27,10 +28,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Get(),
-        new Post(denormalizationContext: ['groups' => ['utilisateur:create']], validationContext: ['groups' => ['Default', 'utilisateur:create']], processor: UtilisateursProcessor::class),
-        new Patch(denormalizationContext: ['groups' => ['utilisateur:update']], validationContext: ['groups' => ['Default', 'utilisateur:update']], processor: UtilisateursProcessor::class),
+        new GetCollection(
+            security: 'is_granted("ROLE_USER")',
+        ),
+        new Get(
+            security: 'is_granted("ROLE_USER")',
+        ),
+        new Post(
+            uriTemplate: '/auth/register',
+            denormalizationContext: ['groups' => ['utilisateur:create']],
+            validationContext: ['groups' => ['Default', 'utilisateur:create']],
+            processor: UtilisateursProcessor::class
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['utilisateur:update']],
+            security: 'is_granted("ROLE_USER")',
+            validationContext: ['groups' => ['Default', 'utilisateur:update']],
+        ),
         new Delete()
     ]
 )]
@@ -47,16 +61,16 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
     #[Groups(['utilisateur:create'])]
     private ?string $login = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['utilisateur:update'])]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['utilisateur:update'])]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['utilisateur:update'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
@@ -99,21 +113,21 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
     private ?string $plainPassword = null;
 
     /**
-     * @var Collection<int, Event>
+     * @var Collection<int, Events>
      */
-    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organized_by', orphanRemoval: true)]
-    private Collection $Events;
+    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', orphanRemoval: true)]
+    private Collection $events;
 
     /**
-     * @var Collection<int, Partication>
+     * @var Collection<int, Partications>
      */
-    #[ORM\OneToMany(targetEntity: Partication::class, mappedBy: 'user_id', orphanRemoval: true)]
-    private Collection $partications;
+    #[ORM\OneToMany(targetEntity: Partications::class, mappedBy: 'user_id', orphanRemoval: true)]
+    private Collection $inscrits;
 
     public function __construct()
     {
-        $this->Events = new ArrayCollection();
-        $this->partications = new ArrayCollection();
+        $this->events = new ArrayCollection();
+        $this->inscrits = new ArrayCollection();
     }
 
     public function getLogin(): ?string
@@ -206,14 +220,16 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeRole($role): void {
+    public function removeRole($role): void
+    {
         $index = array_search($role, $this->roles);
         if ($index !== false) {
             unset($this->roles[$index]);
         }
     }
 
-    public function addRole($role): void {
+    public function addRole($role): void
+    {
         if (!in_array($role, $this->roles)) {
             $this->roles[] = $role;
         }
@@ -268,26 +284,26 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Event>
+     * @return Collection<int, Events>
      */
     public function getEvents(): Collection
     {
-        return $this->Events;
+        return $this->events;
     }
 
-    public function addEvent(Event $event): static
+    public function addEvent(Events $event): static
     {
-        if (!$this->Events->contains($event)) {
-            $this->Events->add($event);
+        if (!$this->events->contains($event)) {
+            $this->events->add($event);
             $event->setOrganizedBy($this);
         }
 
         return $this;
     }
 
-    public function removeEvent(Event $event): static
+    public function removeEvent(Events $event): static
     {
-        if ($this->Events->removeElement($event)) {
+        if ($this->events->removeElement($event)) {
             // set the owning side to null (unless already changed)
             if ($event->getOrganizedBy() === $this) {
                 $event->setOrganizedBy(null);
@@ -298,26 +314,26 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Partication>
+     * @return Collection<int, Partications>
      */
-    public function getPartications(): Collection
+    public function getInscrits(): Collection
     {
-        return $this->partications;
+        return $this->inscrits;
     }
 
-    public function addPartication(Partication $partication): static
+    public function addInscription(Partications $partication): static
     {
-        if (!$this->partications->contains($partication)) {
-            $this->partications->add($partication);
+        if (!$this->inscrits->contains($partication)) {
+            $this->inscrits->add($partication);
             $partication->setUserId($this);
         }
 
         return $this;
     }
 
-    public function removePartication(Partication $partication): static
+    public function removeInscription(Partications $partication): static
     {
-        if ($this->partications->removeElement($partication)) {
+        if ($this->inscrits->removeElement($partication)) {
             // set the owning side to null (unless already changed)
             if ($partication->getUserId() === $this) {
                 $partication->setUserId(null);

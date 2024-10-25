@@ -2,61 +2,108 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_USER')",
+        ),
+        new GetCollection(
+            uriTemplate: '/utilisateurs/{idOrga}/events',
+            uriVariables: [
+                'idOrga' => new Link(
+                    fromProperty: 'id',
+                    fromClass: Utilisateurs::class
+                )
+            ],
+            security: "is_granted('ROLE_ORGA')",
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['event:create']],
+            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')"
+        ),
+        new Patch(
+            denormalizationContext: ['groups' => ['event:update']]
+        ),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['event:read']]
+)]
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-class Event
+class Events
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?\DateTimeInterface $start_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?\DateTimeInterface $end_at = null;
 
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private array $sport = [];
 
     #[ORM\Column(length: 255)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?string $localisation = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?int $max_participants = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?bool $participants_visible = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'Events')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['event:read', 'event:create'])]
     private ?Utilisateurs $organized_by = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['event:read'])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['event:read'])]
     private ?\DateTimeInterface $updated_at = null;
 
     /**
-     * @var Collection<int, Partication>
+     * @var Collection<int, Partications>
      */
-    #[ORM\OneToMany(targetEntity: Partication::class, mappedBy: 'event_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Partications::class, mappedBy: 'event_id', orphanRemoval: true)]
+    #[Groups(['event:read'])]
     private Collection $partications;
 
     public function __construct()
@@ -221,14 +268,18 @@ class Event
     }
 
     /**
-     * @return Collection<int, Partication>
+     * @return Collection<int, Partications>
      */
     public function getPartications(): Collection
     {
-        return $this->partications;
+        if ($this->participants_visible) {
+            return $this->partications;
+        }
+
+        return new ArrayCollection();
     }
 
-    public function addPartication(Partication $partication): static
+    public function addPartication(Partications $partication): static
     {
         if (!$this->partications->contains($partication)) {
             $this->partications->add($partication);
@@ -238,7 +289,7 @@ class Event
         return $this;
     }
 
-    public function removePartication(Partication $partication): static
+    public function removePartication(Partications $partication): static
     {
         if ($this->partications->removeElement($partication)) {
             // set the owning side to null (unless already changed)

@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Partication;
+use App\Entity\Partications;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Partication>
+ * @extends ServiceEntityRepository<Partications>
  */
 class ParticationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Partication::class);
+        parent::__construct($registry, Partications::class);
     }
 
     //    /**
-    //     * @return Partication[] Returns an array of Partication objects
+    //     * @return Partications[] Returns an array of Partications objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class ParticationRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Partication
+    //    public function findOneBySomeField($value): ?Partications
     //    {
     //        return $this->createQueryBuilder('p')
     //            ->andWhere('p.exampleField = :val')
