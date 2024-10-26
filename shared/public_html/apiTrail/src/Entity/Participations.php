@@ -10,7 +10,9 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\ParticipationsRepository;
+use App\State\ParticipationsProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
@@ -25,7 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
                     fromClass: Events::class
                 )
             ],
-            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
+            security: "(is_granted('ROLE_ORGA') and object.getOwnerOfEvent() == user) or is_granted('ROLE_ADMIN')",
         ),
         new GetCollection(
             uriTemplate: '/utilisateurs/{idUser}/participations',
@@ -35,13 +37,15 @@ use Doctrine\ORM\Mapping as ORM;
                     fromClass: Utilisateurs::class
                 )
             ],
+            security: "(is_granted('ROLE_USER') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         ),
         new Post(
             denormalizationContext: ['groups' => ['participation:create']],
             security: "is_granted('ROLE_USER')",
+            processor: ParticipationsProcessor::class
         ),
         new Delete(
-            security: "is_granted('ROLE_USER')",
+            security: "(is_granted('ROLE_USER') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         )
     ]
 )]
@@ -55,10 +59,12 @@ class Participations
 
     #[ORM\ManyToOne(inversedBy: 'partications')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['participation:create'])]
     private ?Utilisateurs $user_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'partications')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['participation:create'])]
     private ?Events $event_id = null;
 
     public function getId(): ?int
@@ -95,5 +101,15 @@ class Participations
         $this->event_id = $event_id;
 
         return $this;
+    }
+
+    public function getOwner(): ?Utilisateurs
+    {
+        return $this->user_id;
+    }
+
+    public function getOwnerOfEvent(): ?Utilisateurs
+    {
+        return $this->event_id->getOrganizedBy();
     }
 }

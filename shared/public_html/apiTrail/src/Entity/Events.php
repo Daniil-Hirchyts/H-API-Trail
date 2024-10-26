@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Utilisateurs::class
                 )
             ],
-            security: "is_granted('ROLE_ORGA')",
+            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
         ),
         new Post(
             denormalizationContext: ['groups' => ['event:create']],
@@ -38,9 +38,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
             processor: EventsProcessor::class
         ),
         new Patch(
-            denormalizationContext: ['groups' => ['event:update']]
+            denormalizationContext: ['groups' => ['event:update']],
+            security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         ),
-        new Delete()
+        new Delete(
+            security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
+        )
     ],
     normalizationContext: ['groups' => ['event:read']]
 )]
@@ -303,5 +306,10 @@ class Events
         }
 
         return $this;
+    }
+
+    public function getOwner(): ?Utilisateurs
+    {
+        return $this->organized_by;
     }
 }
