@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
@@ -9,6 +10,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\EventsRepository;
+use App\State\EventsProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -24,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             uriTemplate: '/utilisateurs/{idOrga}/events',
             uriVariables: [
                 'idOrga' => new Link(
-                    fromProperty: 'id',
+                    fromProperty: 'events',
                     fromClass: Utilisateurs::class
                 )
             ],
@@ -32,7 +34,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new Post(
             denormalizationContext: ['groups' => ['event:create']],
-            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')"
+            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
+            processor: EventsProcessor::class
         ),
         new Patch(
             denormalizationContext: ['groups' => ['event:update']]
@@ -86,9 +89,10 @@ class Events
     #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?float $price = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Events')]
+    #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['event:read', 'event:create'])]
+    #[ApiProperty(readable: true, writable: false)]
     private ?Utilisateurs $organized_by = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -104,11 +108,11 @@ class Events
      */
     #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event_id', orphanRemoval: true)]
     #[Groups(['event:read'])]
-    private Collection $partications;
+    private Collection $participations;
 
     public function __construct()
     {
-        $this->partications = new ArrayCollection();
+        $this->participations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -270,31 +274,31 @@ class Events
     /**
      * @return Collection<int, Participations>
      */
-    public function getPartications(): Collection
+    public function getParticipations(): Collection
     {
         if ($this->participants_visible) {
-            return $this->partications;
+            return $this->participations;
         }
 
         return new ArrayCollection();
     }
 
-    public function addPartication(Participations $partication): static
+    public function addParticipations(Participations $participations): static
     {
-        if (!$this->partications->contains($partication)) {
-            $this->partications->add($partication);
-            $partication->setEventId($this);
+        if (!$this->participations->contains($participations)) {
+            $this->participations->add($participations);
+            $participations->setEventId($this);
         }
 
         return $this;
     }
 
-    public function removePartication(Participations $partication): static
+    public function removeParticipations(Participations $participations): static
     {
-        if ($this->partications->removeElement($partication)) {
+        if ($this->participations->removeElement($participations)) {
             // set the owning side to null (unless already changed)
-            if ($partication->getEventId() === $this) {
-                $partication->setEventId(null);
+            if ($participations->getEventId() === $this) {
+                $participations->setEventId(null);
             }
         }
 

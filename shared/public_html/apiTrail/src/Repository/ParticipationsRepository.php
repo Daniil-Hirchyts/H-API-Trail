@@ -16,6 +16,7 @@ class ParticipationsRepository extends ServiceEntityRepository
         parent::__construct($registry, Participations::class);
     }
 
+
     //    /**
     //     * @return Participations[] Returns an array of Participations objects
     //     */

@@ -45,7 +45,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("ROLE_USER")',
             validationContext: ['groups' => ['Default', 'utilisateur:update']],
         ),
-        new Delete()
+        new Delete(
+            security: 'is_granted("ROLE_USER")',
+        )
     ]
 )]
 class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
@@ -122,12 +124,12 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Participations>
      */
     #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user_id', orphanRemoval: true)]
-    private Collection $inscrits;
+    private Collection $participations;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
-        $this->inscrits = new ArrayCollection();
+        $this->participations = new ArrayCollection();
     }
 
     public function getLogin(): ?string
@@ -321,27 +323,27 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Participations>
      */
-    public function getInscrits(): Collection
+    public function getParticipations(): Collection
     {
-        return $this->inscrits;
+        return $this->participations;
     }
 
-    public function addInscription(Participations $partication): static
+    public function addParticipations(Participations $participations): static
     {
-        if (!$this->inscrits->contains($partication)) {
-            $this->inscrits->add($partication);
-            $partication->setUserId($this);
+        if (!$this->participations->contains($participations)) {
+            $this->participations->add($participations);
+            $participations->setUserId($this);
         }
 
         return $this;
     }
 
-    public function removeInscription(Participations $partication): static
+    public function removeParticipations(Participations $participations): static
     {
-        if ($this->inscrits->removeElement($partication)) {
+        if ($this->participations->removeElement($participations)) {
             // set the owning side to null (unless already changed)
-            if ($partication->getUserId() === $this) {
-                $partication->setUserId(null);
+            if ($participations->getUserId() === $this) {
+                $participations->setUserId(null);
             }
         }
 
