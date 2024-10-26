@@ -8,12 +8,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Enum\Sport;
 use App\Repository\EventRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ApiResource(
     operations: [
@@ -52,6 +55,7 @@ class Events
 
     #[ORM\Column(length: 255)]
     #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Assert\Length(min: 4, max: 40, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 40 caractères!')]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -62,20 +66,23 @@ class Events
     #[Groups(['event:read', 'event:create', 'event:update'])]
     private ?\DateTimeInterface $end_at = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column(enumType: Sport::class)]
     #[Groups(['event:read', 'event:create', 'event:update'])]
-    private array $sport = [];
+    private ?Sport $sport = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Assert\Length(min: 4, max: 255, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 255 caractères!')]
     private ?string $localisation = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 1000)]
     #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Assert\Length(min: 4, max: 1000, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 1000 caractères!')]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Assert\GreaterThanOrEqual(1, message: 'Le nombre maximal de participants doit être au moins 1.')]
     private ?int $max_participants = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
@@ -84,6 +91,7 @@ class Events
 
     #[ORM\Column(nullable: true)]
     #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Assert\Positive(message: 'Le prix doit être supérieur à 0.')]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'Events')]
@@ -105,6 +113,19 @@ class Events
     #[ORM\OneToMany(targetEntity: Partications::class, mappedBy: 'event_id', orphanRemoval: true)]
     #[Groups(['event:read'])]
     private Collection $partications;
+
+    #[Assert\Callback]
+    public function validateDateOrder(ExecutionContextInterface $context): void
+    {
+        if ($this->start_at && $this->end_at && $this->start_at >= $this->end_at) {
+            $context->buildViolation('La date de début doit être avant la date de fin.')
+                ->atPath('start_at')
+                ->addViolation();
+            $context->buildViolation('La date de fin doit être après la date de début.')
+                ->atPath('end_at')
+                ->addViolation();
+        }
+    }
 
     public function __construct()
     {

@@ -62,15 +62,21 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(min: 4, max: 40, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 40 caractères!')]
     #[Groups(['utilisateur:update'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(min: 4, max: 40, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 40 caractères!')]
     #[Groups(['utilisateur:update'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['utilisateur:update'])]
+    #[Assert\Regex(
+        pattern: '#^0[1-9]([-. ]?[0-9]{2}){4}$#',
+        message: 'Le numéro de téléphone n\'est pas valide'
+    )]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
