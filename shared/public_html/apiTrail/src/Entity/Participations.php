@@ -9,7 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Repository\ParticationRepository;
+use App\Repository\ParticipationsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
@@ -42,8 +42,8 @@ use Doctrine\ORM\Mapping as ORM;
         new Delete()
     ]
 )]
-#[ORM\Entity(repositoryClass: ParticationRepository::class)]
-class Partications
+#[ORM\Entity(repositoryClass: ParticipationsRepository::class)]
+class Participations
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

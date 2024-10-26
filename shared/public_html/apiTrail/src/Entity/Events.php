@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Repository\EventRepository;
+use App\Repository\EventsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -41,7 +41,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     normalizationContext: ['groups' => ['event:read']]
 )]
-#[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\Entity(repositoryClass: EventsRepository::class)]
 class Events
 {
     #[ORM\Id]
@@ -100,9 +100,9 @@ class Events
     private ?\DateTimeInterface $updated_at = null;
 
     /**
-     * @var Collection<int, Partications>
+     * @var Collection<int, Participations>
      */
-    #[ORM\OneToMany(targetEntity: Partications::class, mappedBy: 'event_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event_id', orphanRemoval: true)]
     #[Groups(['event:read'])]
     private Collection $partications;
 
@@ -268,7 +268,7 @@ class Events
     }
 
     /**
-     * @return Collection<int, Partications>
+     * @return Collection<int, Participations>
      */
     public function getPartications(): Collection
     {
@@ -279,7 +279,7 @@ class Events
         return new ArrayCollection();
     }
 
-    public function addPartication(Partications $partication): static
+    public function addPartication(Participations $partication): static
     {
         if (!$this->partications->contains($partication)) {
             $this->partications->add($partication);
@@ -289,7 +289,7 @@ class Events
         return $this;
     }
 
-    public function removePartication(Partications $partication): static
+    public function removePartication(Participations $partication): static
     {
         if ($this->partications->removeElement($partication)) {
             // set the owning side to null (unless already changed)

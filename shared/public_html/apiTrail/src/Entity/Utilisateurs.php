@@ -119,9 +119,9 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $events;
 
     /**
-     * @var Collection<int, Partications>
+     * @var Collection<int, Participations>
      */
-    #[ORM\OneToMany(targetEntity: Partications::class, mappedBy: 'user_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user_id', orphanRemoval: true)]
     private Collection $inscrits;
 
     public function __construct()
@@ -319,14 +319,14 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Partications>
+     * @return Collection<int, Participations>
      */
     public function getInscrits(): Collection
     {
         return $this->inscrits;
     }
 
-    public function addInscription(Partications $partication): static
+    public function addInscription(Participations $partication): static
     {
         if (!$this->inscrits->contains($partication)) {
             $this->inscrits->add($partication);
@@ -336,7 +336,7 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeInscription(Partications $partication): static
+    public function removeInscription(Participations $partication): static
     {
         if ($this->inscrits->removeElement($partication)) {
             // set the owning side to null (unless already changed)
