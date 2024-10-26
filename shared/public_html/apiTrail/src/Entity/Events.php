@@ -38,7 +38,7 @@ use Symfony\Flex\Unpack\Operation;
         new Post(
             description: "Crée un event",
             denormalizationContext: ['groups' => ['event:create']],
-            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_ORGA')",
             processor: EventsProcessor::class,
         ),
         new Patch(
