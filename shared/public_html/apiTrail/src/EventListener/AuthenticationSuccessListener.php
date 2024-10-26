@@ -12,10 +12,6 @@ class AuthenticationSuccessListener
         $data = $event->getData();
         $user = $event->getUser();
 
-        if (!$user instanceof UserInterface) {
-            return;
-        }
-
         $data['data'] = [
             'roles' => $user->getRoles(),
             'login' => $user->getLogin(),

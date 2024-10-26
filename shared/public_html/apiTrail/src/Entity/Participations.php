@@ -9,7 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Repository\ParticationRepository;
+use App\Repository\ParticipationsRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
@@ -18,32 +18,35 @@ use Doctrine\ORM\Mapping as ORM;
             security: "is_granted('ROLE_ADMIN')",
         ),
         new GetCollection(
-            uriTemplate: '/events/{idEvent}/partications',
+            uriTemplate: '/events/{idEvent}/participations',
             uriVariables: [
                 'idEvent' => new Link(
-                    fromProperty: 'partications',
+                    fromProperty: 'participations',
                     fromClass: Events::class
                 )
             ],
             security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
         ),
         new GetCollection(
-            uriTemplate: '/utilisateurs/{idUser}/partications',
+            uriTemplate: '/utilisateurs/{idUser}/participations',
             uriVariables: [
                 'idUser' => new Link(
-                    fromProperty: 'partications',
+                    fromProperty: 'participations',
                     fromClass: Utilisateurs::class
                 )
             ],
         ),
-        new Get(),
-        new Post(),
-        new Patch(),
-        new Delete()
+        new Post(
+            denormalizationContext: ['groups' => ['participation:create']],
+            security: "is_granted('ROLE_USER')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER')",
+        )
     ]
 )]
-#[ORM\Entity(repositoryClass: ParticationRepository::class)]
-class Partications
+#[ORM\Entity(repositoryClass: ParticipationsRepository::class)]
+class Participations
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
