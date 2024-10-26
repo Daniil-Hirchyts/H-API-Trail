@@ -5,8 +5,6 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Utilisateurs;
-use App\Repository\UtilisateursRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -15,9 +13,7 @@ class UtilisateursProcessor implements ProcessorInterface
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private readonly ProcessorInterface          $persistProcessor,
-        private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly UtilisateursRepository      $utilisateursRepository,
-        private readonly EntityManagerInterface      $entityManager
+        private readonly UserPasswordHasherInterface $passwordHasher
     )
     {
     }
