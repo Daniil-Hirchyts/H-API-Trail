@@ -16,10 +16,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Flex\Unpack\Operation;
 
 #[ApiResource(
     operations: [
         new GetCollection(
+            description: "Récupère les events",
             security: "is_granted('ROLE_USER')",
         ),
         new GetCollection(
@@ -30,18 +32,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Utilisateurs::class
                 )
             ],
-            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
+            description: "Récupère les events d'un organisateur",
+            security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         ),
         new Post(
+            description: "Crée un event",
             denormalizationContext: ['groups' => ['event:create']],
             security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
-            processor: EventsProcessor::class
+            deserialize: false,
+            processor: EventsProcessor::class,
         ),
         new Patch(
+            description: "Met à jour un event",
             denormalizationContext: ['groups' => ['event:update']],
             security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         ),
         new Delete(
+            description: "Supprime un event",
             security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         )
     ],
@@ -110,7 +117,6 @@ class Events
      * @var Collection<int, Participations>
      */
     #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event_id', orphanRemoval: true)]
-    #[Groups(['event:read'])]
     private Collection $participations;
 
     public function __construct()
@@ -310,6 +316,6 @@ class Events
 
     public function getOwner(): ?Utilisateurs
     {
-        return $this->organized_by;
+        return $this->getOrganizedBy();
     }
 }

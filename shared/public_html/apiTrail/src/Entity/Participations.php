@@ -12,11 +12,14 @@ use ApiPlatform\Metadata\Post;
 use App\Repository\ParticipationsRepository;
 use App\State\ParticipationsProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+#[UniqueEntity(fields: ['user_id', 'event_id'], message: "Un user ne peut pas être inscrit plus d'une fois au même event.")]
 #[ApiResource(
     operations: [
         new GetCollection(
+            description: "Récupère les participations",
             security: "is_granted('ROLE_ADMIN')",
         ),
         new GetCollection(
@@ -27,6 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Events::class
                 )
             ],
+            description: "Récupère les participations d'un event",
             security: "(is_granted('ROLE_ORGA') and object.getOwnerOfEvent() == user) or is_granted('ROLE_ADMIN')",
         ),
         new GetCollection(
@@ -37,15 +41,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
                     fromClass: Utilisateurs::class
                 )
             ],
+            description: "Récupère les participations d'un utilisateur",
             security: "(is_granted('ROLE_USER') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         ),
         new Post(
+            description: "Inscrit un utilisateurs à un event",
             denormalizationContext: ['groups' => ['participation:create']],
             security: "is_granted('ROLE_USER')",
             processor: ParticipationsProcessor::class
         ),
         new Delete(
-            security: "(is_granted('ROLE_USER') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
+            description: "Retire un utilisateurs d'un event",
+            security: "(is_granted('ROLE_USER') and object and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         )
     ]
 )]
@@ -101,15 +108,5 @@ class Participations
         $this->event_id = $event_id;
 
         return $this;
-    }
-
-    public function getOwner(): ?Utilisateurs
-    {
-        return $this->user_id;
-    }
-
-    public function getOwnerOfEvent(): ?Utilisateurs
-    {
-        return $this->event_id->getOrganizedBy();
     }
 }

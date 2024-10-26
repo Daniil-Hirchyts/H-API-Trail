@@ -29,23 +29,28 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
+            description: 'Récupère les utilisateurs',
             security: 'is_granted("ROLE_ADMIN")',
         ),
         new Get(
+            description: 'Récupère un utilisateur',
             security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
         ),
         new Post(
             uriTemplate: '/auth/register',
+            description: 'Crée un utilisateur',
             denormalizationContext: ['groups' => ['utilisateur:create']],
             validationContext: ['groups' => ['Default', 'utilisateur:create']],
-            processor: UtilisateursProcessor::class
+            processor: UtilisateursProcessor::class,
         ),
         new Patch(
+            description: 'Met à jour un utilisateur',
             denormalizationContext: ['groups' => ['utilisateur:update']],
             security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
             validationContext: ['groups' => ['Default', 'utilisateur:update']],
         ),
         new Delete(
+            description: 'Supprime un utilisateur',
             security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
         )
     ]
