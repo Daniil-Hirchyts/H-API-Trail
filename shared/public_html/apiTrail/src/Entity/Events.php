@@ -39,7 +39,6 @@ use Symfony\Flex\Unpack\Operation;
             description: "Crée un event",
             denormalizationContext: ['groups' => ['event:create']],
             security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
-            deserialize: false,
             processor: EventsProcessor::class,
         ),
         new Patch(
@@ -52,7 +51,8 @@ use Symfony\Flex\Unpack\Operation;
             security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         )
     ],
-    normalizationContext: ['groups' => ['event:read']]
+    normalizationContext: ['groups' => ['event:read', 'participation:utilisateur:read']],
+    denormalizationContext: ['groups' => ['event:write']],
 )]
 #[ORM\Entity(repositoryClass: EventsRepository::class)]
 class Events
@@ -60,63 +60,64 @@ class Events
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'participation:utilisateur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $start_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $end_at = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private array $sport = [];
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?string $localisation = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?int $max_participants = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?bool $participants_visible = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['event:read', 'event:create'])]
+    #[Groups(['event:read', 'event:create', 'event:write', 'event:read', 'participation:utilisateur:read'])]
     #[ApiProperty(readable: true, writable: false)]
     private ?Utilisateurs $organized_by = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $updated_at = null;
 
     /**
      * @var Collection<int, Participations>
      */
-    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event', orphanRemoval: true)]
+    #[Groups(['event:read'])]
     private Collection $participations;
 
     public function __construct()
@@ -318,4 +319,5 @@ class Events
     {
         return $this->getOrganizedBy();
     }
+
 }

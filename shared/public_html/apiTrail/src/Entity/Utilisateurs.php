@@ -53,38 +53,41 @@ use Symfony\Component\Validator\Constraints as Assert;
             description: 'Supprime un utilisateur',
             security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
         )
-    ]
+    ],
+    normalizationContext: ['groups' => ['utilisateur:read','participation:event:read']],
+    denormalizationContext: ['groups' => ['utilisateur:write']],
 )]
 class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['utilisateur:read', 'participation:event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(groups: ['utilisateur:create'])]
     #[Assert\Length(min: 4, max: 20, minMessage: 'Il faut au moins 4 caractères pour le login!', maxMessage: 'Il faut moins de 20 caractères pour le login!')]
-    #[Groups(['utilisateur:create'])]
+    #[Groups(['utilisateur:create','utilisateur:read', 'participation:event:read'])]
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['utilisateur:update'])]
+    #[Groups(['utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['utilisateur:update'])]
+    #[Groups(['utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['utilisateur:update'])]
+    #[Groups(['utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['utilisateur:create'])]
     #[Assert\NotNull(groups: ['utilisateur:create'])]
     #[Assert\Email(message: 'L\'adresse email n\'est pas valide')]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -92,13 +95,15 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $hash = null;
 
     #[ORM\Column]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private array $roles = [];
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ApiProperty(readable: false)]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ApiProperty(readable: false)]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ApiProperty(readable: false)]
@@ -116,19 +121,22 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial',
         groups: ['utilisateur:create']
     )]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $plainPassword = null;
+
 
     /**
      * @var Collection<int, Events>
      */
-    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', cascade: ['persist'],orphanRemoval: true)]
+    #[Groups(['utilisateur:read'])]
     private Collection $events;
 
     /**
      * @var Collection<int, Participations>
      */
-    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user', cascade: ['persist'],orphanRemoval: true)]
+    #[Groups(['utilisateur:read'])]
     private Collection $participations;
 
     public function __construct()

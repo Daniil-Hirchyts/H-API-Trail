@@ -16,6 +16,18 @@ class ParticipationsRepository extends ServiceEntityRepository
         parent::__construct($registry, Participations::class);
     }
 
+    public function checkIfParticipationExists($userId, $eventId): bool
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->select('COUNT(p.id)');
+        $qb->andWhere('p.event = :eventId');
+        $qb->andWhere('p.user = :userId');
+        $qb->setParameter('eventId', $eventId);
+        $qb->setParameter('userId', $userId);
+        $count = $qb->getQuery()->getSingleScalarResult();
+        return $count > 0;
+    }
+
 
     //    /**
     //     * @return Participations[] Returns an array of Participations objects
