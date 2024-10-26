@@ -7,7 +7,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UtilisateursRepository;
@@ -18,6 +17,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -48,7 +48,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete()
     ]
 )]
-class Utilisateurs implements PasswordAuthenticatedUserInterface
+class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -287,6 +287,11 @@ class Utilisateurs implements PasswordAuthenticatedUserInterface
     public function getPassword(): ?string
     {
         return $this->hash;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->login;
     }
 
     /**
