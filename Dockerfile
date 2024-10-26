@@ -58,3 +58,8 @@ RUN mkdir /root/workspace
 RUN a2enmod rewrite
 RUN a2enmod ssl
 RUN service apache2 start
+
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
