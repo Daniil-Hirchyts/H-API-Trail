@@ -184,12 +184,12 @@ class Events
         return $this;
     }
 
-    public function getSport(): array
+    public function getSport(): ?Sport
     {
         return $this->sport;
     }
 
-    public function setSport(array $sport): static
+    public function setSport(?Sport $sport): static
     {
         $this->sport = $sport;
 
