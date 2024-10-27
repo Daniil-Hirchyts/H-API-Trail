@@ -90,7 +90,12 @@ Assurez-vous d'avoir installé Docker et Docker Compose sur votre machine.
       ```
       Ce mode utilise à la fois `compose.yaml` et `compose.prod.yaml` pour une configuration adaptée en production, sans volumes partagés et avec les ports standards.
 
-3. **Accès à l'API** :
+3. **Configuration des JWT** :
+   Pour que l'authentification avec JWT fonctionne correctement, exécutez la commande suivante pour générer les clés de chiffrement JWT :
+   ```bash
+   php bin/console lexik:jwt:generate-keypair
+   
+4. **Accès à l'API** :
     - En mode **développement** : Accès à `http://localhost:80` (ou port spécifié).
     - En mode **production** : Accès à `https://localhost:443` avec un certificat SSL auto-signé.
 
