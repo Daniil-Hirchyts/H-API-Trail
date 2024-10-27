@@ -31,7 +31,3 @@ services:
   App\Security\Voter\RoleVoter:
     tags:
       - { name: security.voter }
-
-  App\Security\Voter\OwnerVoter:
-    tags:
-      - { name: security.voter }
