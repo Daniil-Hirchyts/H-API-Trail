@@ -52,8 +52,6 @@ Ci-dessous, vous trouverez une liste des routes disponibles dans l'API. Elle pre
     - `GET /api/participations/{id}`
 - **Créer une nouvelle participation**
     - `POST /api/participations`
-- **Supprimer toutes les participations d'un utilisateur**
-    - `DELETE /api/utilisateurs/{idUser}/participations`
 - **Supprimer une participation spécifique d'un utilisateur**
     - `DELETE /api/utilisateurs/{idUser}/participations/{idParticipation}`
 - **Récupérer les participations d'un événement**
