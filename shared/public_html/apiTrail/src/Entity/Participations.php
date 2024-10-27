@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\ParticipationsRepository;
 use App\State\DeleteParticipationProcessor;
-use App\State\IsOwnerOfEventProcessor;
+use App\State\GetInfoParticipationProcessor;
 use App\State\ParticipationUtilisateurProcessor;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -30,11 +31,29 @@ use Symfony\Component\Validator\Constraints\NotNull;
             description: "Créer une participation",
             security: "is_granted('ROLE_USER')",
             processor: ParticipationUtilisateurProcessor::class
-        )
+        ),
     ],
     normalizationContext: ["groups" => ['participation:read']],
     denormalizationContext: ["groups" => ['participation:write']],
     validationContext: ["groups" => ["Default", 'participation:write']],
+)]
+#[ApiResource(
+    uriTemplate: '/participations/{id}',
+    operations: [
+        new Get(
+            description: "Récupérer une participation",
+            security: "is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')",
+            processor: GetInfoParticipationProcessor::class
+        ),
+    ],
+    uriVariables: [
+        'id' => new Link(
+            fromClass: Participations::class,
+        )
+    ],
+    normalizationContext: ["groups" => ['infoparticipation:read']],
+    denormalizationContext: ["groups" => ['infoparticipation:write']],
+    validationContext: ["groups" => ["Default", 'infoparticipation:write']],
 )]
 #[ApiResource(
     uriTemplate: '/utilisateurs/{idUser}/participations',
@@ -88,9 +107,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
             fromClass: Events::class,
         )
     ],
-    normalizationContext: ["groups" => ['participation:utilisateur:read','event:read']],
-    denormalizationContext: ["groups" => ['participation:utilisateur:write','event:write']],
-    validationContext: ["groups" => ["Default", 'participation:utilisateur:write','event:write']]
+    normalizationContext: ["groups" => ['participation:utilisateur:read', 'event:read']],
+    denormalizationContext: ["groups" => ['participation:utilisateur:write', 'event:write']],
+    validationContext: ["groups" => ["Default", 'participation:utilisateur:write', 'event:write']]
 )]
 #[ApiResource(
     operations: [
@@ -109,19 +128,19 @@ class Participations
     #[Id]
     #[GeneratedValue]
     #[Column]
-    #[Groups(['participation:read','participation:utilisateur:read','participation:event:read', 'participation:utlisateur:write','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','participation:read', 'participation:utilisateur:read', 'participation:event:read', 'participation:utlisateur:write', 'participation:utilisateur:event:read'])]
     private ?int $id = null;
 
     #[ManyToOne(inversedBy: 'participations')]
     #[JoinColumn(name: 'user_id', nullable: false, onDelete: "CASCADE")]
-    #[Groups(['participation:write', 'participation:read','participation:utilisateur:read', 'participation:utlisateur:write','participation:event:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','participation:write', 'participation:read', 'participation:utilisateur:read', 'participation:utlisateur:write', 'participation:event:read', 'participation:utilisateur:event:read'])]
     private ?Utilisateurs $user = null;
 
     #[ManyToOne(inversedBy: 'participations')]
     #[JoinColumn(name: 'event_id', nullable: false, onDelete: "CASCADE")]
-    #[NotBlank(groups: ['participation:write','event:write'])]
-    #[NotNull(groups: ['participation:write','event:write'])]
-    #[Groups(['participation:write', 'participation:read','participation:event:read', 'participation:utlisateur:write','participation:event:read','participation:utilisateur:event:read'])]
+    #[NotBlank(groups: ['participation:write', 'event:write'])]
+    #[NotNull(groups: ['participation:write', 'event:write'])]
+    #[Groups(['infoparticipation:read','participation:write', 'participation:read', 'participation:event:read', 'participation:utlisateur:write', 'participation:event:read', 'participation:utilisateur:event:read'])]
     private ?Events $event = null;
 
     public function getId(): ?int

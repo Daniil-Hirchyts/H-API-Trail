@@ -95,32 +95,32 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['updateutilisateur:read','utilisateur:read', 'participation:event:read','participation:utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:read', 'participation:event:read','participation:utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(groups: ['utilisateur:create'])]
     #[Assert\Length(min: 4, max: 20, minMessage: 'Il faut au moins 4 caractères pour le login!', maxMessage: 'Il faut moins de 20 caractères pour le login!')]
-    #[Groups(['updateutilisateur:read','utilisateur:create','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:create','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['utilisateur:create'])]
     #[Assert\NotNull(groups: ['utilisateur:create'])]
     #[Assert\Email(message: 'L\'adresse email n\'est pas valide')]
-    #[Groups(['updateutilisateur:read','utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -128,7 +128,7 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $hash = null;
 
     #[ORM\Column]
-    #[Groups(['updateutilisateur:read','utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role','allutilisateur:read','infoutilisateur:read'])]
     private array $roles = [];
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

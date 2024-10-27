@@ -60,35 +60,35 @@ class Events
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?\DateTimeInterface $start_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?\DateTimeInterface $end_at = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private array $sport = [];
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $localisation = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?int $max_participants = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
@@ -96,12 +96,12 @@ class Events
     private ?bool $participants_visible = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['event:read', 'event:create', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:read', 'event:create', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     #[ApiProperty(readable: true, writable: false)]
     private ?Utilisateurs $organized_by = null;
 
