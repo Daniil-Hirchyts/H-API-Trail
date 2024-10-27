@@ -27,7 +27,7 @@ class ParticipationsRepository extends ServiceEntityRepository
         $count = $qb->getQuery()->getSingleScalarResult();
         return $count > 0;
     }
-    public function getParrticipationById($participationId)
+    public function getParticipationById($participationId)
     {
         $qb = $this->createQueryBuilder('p');
         $qb->andWhere('p.id = :participationId');
@@ -35,6 +35,14 @@ class ParticipationsRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    public function getCountOfParticipationsByEvent($eventId): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->select('COUNT(p.id)');
+        $qb->andWhere('p.event = :eventId');
+        $qb->setParameter('eventId', $eventId);
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 
     //    /**
     //     * @return Participations[] Returns an array of Participations objects

@@ -30,7 +30,7 @@ class DeleteParticipationProcessor implements ProcessorInterface
             throw new \Exception('User not found or not authorized.');
         }
 
-        $userIdOfParticipation = $this->participationsRepository->getParrticipationById($participationId)->getUser()->getId();
+        $userIdOfParticipation = $this->participationsRepository->getParticipationById($participationId)->getUser()->getId();
 
         if (!$this->security->isGranted('ROLE_ADMIN') && $actualUser->getId() !== $userIdOfParticipation) {
             throw new \Exception('User not authorized.');
