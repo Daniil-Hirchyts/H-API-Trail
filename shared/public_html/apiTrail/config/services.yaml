@@ -28,3 +28,10 @@ services:
     tags:
       - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
 
+  App\Security\Voter\RoleVoter:
+    tags:
+      - { name: security.voter }
+
+  App\Security\Voter\OwnerVoter:
+    tags:
+      - { name: security.voter }

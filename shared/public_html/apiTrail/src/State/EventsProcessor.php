@@ -18,7 +18,6 @@ class EventsProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        dump($data);
         $user = $this->security->getUser();
         if ($user instanceof Utilisateurs) {
             $data->setOrganizedBy($user);

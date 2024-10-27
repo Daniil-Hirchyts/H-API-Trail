@@ -27,6 +27,13 @@ class ParticipationsRepository extends ServiceEntityRepository
         $count = $qb->getQuery()->getSingleScalarResult();
         return $count > 0;
     }
+    public function getParrticipationById($participationId)
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->andWhere('p.id = :participationId');
+        $qb->setParameter('participationId', $participationId);
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 
 
     //    /**
@@ -53,4 +60,12 @@ class ParticipationsRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function deleteParticipation(mixed $participationId): void
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->delete();
+        $qb->andWhere('p.id = :participationId');
+        $qb->setParameter('participationId', $participationId);
+        $qb->getQuery()->execute();
+    }
 }

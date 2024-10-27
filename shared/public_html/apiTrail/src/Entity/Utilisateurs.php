@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UtilisateursRepository;
+use App\State\ChangeRoleProcessor;
 use App\State\UtilisateursProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -44,6 +45,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: UtilisateursProcessor::class,
         ),
         new Patch(
+            uriTemplate: '/utilisateurs/{id}/changeRole',
+            description: "Changer le role d'un utilisateur",
+            denormalizationContext: ['groups' => ['utilisateur:read:role']],
+            security: 'is_granted("ROLE_ADMIN") and is_granted("CHANGER_ROLES", object)',
+            validationContext: ['groups' => ['Default', 'utilisateur:read:role']],
+            processor: ChangeRoleProcessor::class,
+        ),
+        new Patch(
             description: 'Met à jour un utilisateur',
             denormalizationContext: ['groups' => ['utilisateur:update']],
             security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
@@ -57,6 +66,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['utilisateur:read','participation:event:read']],
     denormalizationContext: ['groups' => ['utilisateur:write']],
 )]
+#[ORM\HasLifecycleCallbacks]
 class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -95,7 +105,7 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $hash = null;
 
     #[ORM\Column]
-    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role'])]
     private array $roles = [];
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -143,6 +153,12 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->events = new ArrayCollection();
         $this->participations = new ArrayCollection();
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
+        $this->updated_at = new \DateTime();
     }
 
     public function getLogin(): ?string

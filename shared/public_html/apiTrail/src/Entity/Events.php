@@ -33,7 +33,7 @@ use Symfony\Flex\Unpack\Operation;
                 )
             ],
             description: "Récupère les events d'un organisateur",
-            security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
+            security: "(is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
         ),
         new Post(
             description: "Crée un event",

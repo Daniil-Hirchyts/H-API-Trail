@@ -8,7 +8,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Repository\ParticipationsRepository;
-use App\State\ParticipationsProcessor;
+use App\State\DeleteParticipationProcessor;
+use App\State\IsOwnerOfEventProcessor;
 use App\State\ParticipationUtilisateurProcessor;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -55,7 +56,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
     operations: [
         new Delete(
             description: "Supprimer une participation",
-            security: "(is_granted('ROLE_USER') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')",
+            processor: DeleteParticipationProcessor::class,
         )
     ],
     uriVariables: [
@@ -74,7 +76,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
     operations: [
         new GetCollection(
             description: "Récupérer les participations d'un event",
-            security: "(is_granted('ROLE_ORGA') and object.getOwnerOfEvent() == user) or is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
         ),
     ],
     uriVariables: [
@@ -109,14 +111,14 @@ class Participations
 
     #[ManyToOne(inversedBy: 'participations')]
     #[JoinColumn(name: 'user_id', nullable: false, onDelete: "CASCADE")]
-    #[Groups(['participation:write', 'participation:read','participation:utilisateur:read', 'participation:utlisateur:write'])]
+    #[Groups(['participation:write', 'participation:read','participation:utilisateur:read', 'participation:utlisateur:write','participation:event:read'])]
     private ?Utilisateurs $user = null;
 
     #[ManyToOne(inversedBy: 'participations')]
     #[JoinColumn(name: 'event_id', nullable: false, onDelete: "CASCADE")]
     #[NotBlank(groups: ['participation:write','event:write'])]
     #[NotNull(groups: ['participation:write','event:write'])]
-    #[Groups(['participation:write', 'participation:read','participation:event:read', 'participation:utlisateur:write'])]
+    #[Groups(['participation:write', 'participation:read','participation:event:read', 'participation:utlisateur:write','participation:event:read'])]
     private ?Events $event = null;
 
     public function getId(): ?int
