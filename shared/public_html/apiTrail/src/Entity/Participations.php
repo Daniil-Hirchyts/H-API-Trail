@@ -43,10 +43,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
             description: "Récupérer les participations d'un utilisateur",
             security: "is_granted('ROLE_USER')",
         ),
-        new Delete(
-            description: "Supprimer une participation",
-            security: "(is_granted('ROLE_USER') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
-        )
     ],
     uriVariables: [
         'idUser' => new Link(
