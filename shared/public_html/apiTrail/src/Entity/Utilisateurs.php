@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UtilisateursRepository;
+use App\State\ChangeRoleProcessor;
 use App\State\UtilisateursProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -29,63 +30,74 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: 'is_granted("ROLE_USER")',
+            description: 'Récupère les utilisateurs',
+            security: 'is_granted("ROLE_ADMIN")',
         ),
         new Get(
-            security: 'is_granted("ROLE_USER")',
+            description: 'Récupère un utilisateur',
+            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
         ),
         new Post(
             uriTemplate: '/auth/register',
+            description: 'Crée un utilisateur',
             denormalizationContext: ['groups' => ['utilisateur:create']],
             validationContext: ['groups' => ['Default', 'utilisateur:create']],
-            processor: UtilisateursProcessor::class
+            processor: UtilisateursProcessor::class,
         ),
         new Patch(
+            uriTemplate: '/utilisateurs/{id}/changeRole',
+            description: "Changer le role d'un utilisateur",
+            denormalizationContext: ['groups' => ['utilisateur:read:role']],
+            security: 'is_granted("ROLE_ADMIN") and is_granted("CHANGER_ROLES", object)',
+            validationContext: ['groups' => ['Default', 'utilisateur:read:role']],
+            processor: ChangeRoleProcessor::class,
+        ),
+        new Patch(
+            description: 'Met à jour un utilisateur',
             denormalizationContext: ['groups' => ['utilisateur:update']],
-            security: 'is_granted("ROLE_USER")',
+            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
             validationContext: ['groups' => ['Default', 'utilisateur:update']],
         ),
         new Delete(
-            security: 'is_granted("ROLE_USER")',
+            description: 'Supprime un utilisateur',
+            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
         )
-    ]
+    ],
+    normalizationContext: ['groups' => ['utilisateur:read','participation:event:read']],
+    denormalizationContext: ['groups' => ['utilisateur:write']],
 )]
+#[ORM\HasLifecycleCallbacks]
 class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['utilisateur:read', 'participation:event:read','participation:utilisateur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(groups: ['utilisateur:create'])]
     #[Assert\Length(min: 4, max: 20, minMessage: 'Il faut au moins 4 caractères pour le login!', maxMessage: 'Il faut moins de 20 caractères pour le login!')]
-    #[Groups(['utilisateur:create'])]
+    #[Groups(['utilisateur:create','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Length(min: 4, max: 40, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 40 caractères!')]
-    #[Groups(['utilisateur:update'])]
+    #[Groups(['utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Length(min: 4, max: 40, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 40 caractères!')]
-    #[Groups(['utilisateur:update'])]
+    #[Groups(['utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['utilisateur:update'])]
-    #[Assert\Regex(
-        pattern: '#^0[1-9]([-. ]?[0-9]{2}){4}$#',
-        message: 'Le numéro de téléphone n\'est pas valide'
-    )]
+    #[Groups(['utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['utilisateur:create'])]
     #[Assert\NotNull(groups: ['utilisateur:create'])]
     #[Assert\Email(message: 'L\'adresse email n\'est pas valide')]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -93,13 +105,15 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $hash = null;
 
     #[ORM\Column]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role'])]
     private array $roles = [];
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ApiProperty(readable: false)]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ApiProperty(readable: false)]
     private ?\DateTimeInterface $updated_at = null;
 
     #[ApiProperty(readable: false)]
@@ -117,25 +131,34 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial',
         groups: ['utilisateur:create']
     )]
-    #[Groups(['utilisateur:create', 'utilisateur:update'])]
+    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $plainPassword = null;
+
 
     /**
      * @var Collection<int, Events>
      */
-    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', cascade: ['persist'],orphanRemoval: true)]
+    #[Groups(['utilisateur:read'])]
     private Collection $events;
 
     /**
      * @var Collection<int, Participations>
      */
-    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user', cascade: ['persist'],orphanRemoval: true)]
+    #[Groups(['utilisateur:read'])]
     private Collection $participations;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->participations = new ArrayCollection();
+    }
+
+    #[ORM\PreUpdate]
+    public function preUpdate(): void
+    {
+        $this->updated_at = new \DateTime();
     }
 
     public function getLogin(): ?string
@@ -353,6 +376,11 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    public function getOwner(): ?Utilisateurs
+    {
         return $this;
     }
 }

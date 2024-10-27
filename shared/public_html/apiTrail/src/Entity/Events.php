@@ -11,18 +11,17 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\EventsRepository;
 use App\State\EventsProcessor;
-use App\Enum\Sport;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Flex\Unpack\Operation;
 
 #[ApiResource(
     operations: [
         new GetCollection(
+            description: "Récupère les events",
             security: "is_granted('ROLE_USER')",
         ),
         new GetCollection(
@@ -33,19 +32,27 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
                     fromClass: Utilisateurs::class
                 )
             ],
-            security: "is_granted('ROLE_ORGA')",
+            description: "Récupère les events d'un organisateur",
+            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
         ),
         new Post(
+            description: "Crée un event",
             denormalizationContext: ['groups' => ['event:create']],
-            security: "is_granted('ROLE_ORGA') or is_granted('ROLE_ADMIN')",
-            processor: EventsProcessor::class
+            security: "is_granted('ROLE_ORGA')",
+            processor: EventsProcessor::class,
         ),
         new Patch(
-            denormalizationContext: ['groups' => ['event:update']]
+            description: "Met à jour un event",
+            denormalizationContext: ['groups' => ['event:update']],
+            security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
         ),
-        new Delete()
+        new Delete(
+            description: "Supprime un event",
+            security: "(is_granted('ROLE_ORGA') and object.getOwner() == user) or is_granted('ROLE_ADMIN')",
+        )
     ],
-    normalizationContext: ['groups' => ['event:read']]
+    normalizationContext: ['groups' => ['event:read', 'participation:utilisateur:read']],
+    denormalizationContext: ['groups' => ['event:write']],
 )]
 #[ORM\Entity(repositoryClass: EventsRepository::class)]
 class Events
@@ -53,83 +60,65 @@ class Events
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['event:read'])]
+    #[Groups(['event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
-    #[Assert\Length(min: 4, max: 40, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 40 caractères!')]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?\DateTimeInterface $start_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?\DateTimeInterface $end_at = null;
 
-    #[ORM\Column(enumType: Sport::class)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
-    private ?Sport $sport = null;
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    private array $sport = [];
 
     #[ORM\Column(length: 255)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
-    #[Assert\Length(min: 4, max: 255, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 255 caractères!')]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $localisation = null;
 
-    #[ORM\Column(length: 1000)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
-    #[Assert\Length(min: 4, max: 1000, minMessage: 'Il faut au moins 4 caractères!', maxMessage: 'Il faut moins de 1000 caractères!')]
+    #[ORM\Column(length: 255)]
+    #[Groups(['event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
-    #[Assert\GreaterThanOrEqual(1, message: 'Le nombre maximal de participants doit être au moins 1.')]
+    #[Groups(['event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?int $max_participants = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?bool $participants_visible = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['event:read', 'event:create', 'event:update'])]
-    #[Assert\Positive(message: 'Le prix doit être supérieur à 0.')]
+    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['event:read', 'event:create'])]
+    #[Groups(['event:read', 'event:create', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     #[ApiProperty(readable: true, writable: false)]
     private ?Utilisateurs $organized_by = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:read'])]
+    #[Groups(['event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $updated_at = null;
 
     /**
      * @var Collection<int, Participations>
      */
-    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'event', orphanRemoval: true)]
     #[Groups(['event:read'])]
     private Collection $participations;
-
-    #[Assert\Callback]
-    public function validateDateOrder(ExecutionContextInterface $context): void
-    {
-        if ($this->start_at && $this->end_at && $this->start_at >= $this->end_at) {
-            $context->buildViolation('La date de début doit être avant la date de fin.')
-                ->atPath('start_at')
-                ->addViolation();
-            $context->buildViolation('La date de fin doit être après la date de début.')
-                ->atPath('end_at')
-                ->addViolation();
-        }
-    }
 
     public function __construct()
     {
@@ -184,12 +173,12 @@ class Events
         return $this;
     }
 
-    public function getSport(): ?Sport
+    public function getSport(): array
     {
         return $this->sport;
     }
 
-    public function setSport(?Sport $sport): static
+    public function setSport(array $sport): static
     {
         $this->sport = $sport;
 
@@ -295,6 +284,7 @@ class Events
     /**
      * @return Collection<int, Participations>
      */
+    #[Groups(['event:read','participation:utilisateur:read'])]
     public function getParticipations(): Collection
     {
         if ($this->participants_visible) {
@@ -325,4 +315,10 @@ class Events
 
         return $this;
     }
+
+    public function getOwner(): ?Utilisateurs
+    {
+        return $this->getOrganizedBy();
+    }
+
 }

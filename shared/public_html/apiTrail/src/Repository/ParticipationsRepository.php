@@ -16,6 +16,33 @@ class ParticipationsRepository extends ServiceEntityRepository
         parent::__construct($registry, Participations::class);
     }
 
+    public function checkIfParticipationExists($userId, $eventId): bool
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->select('COUNT(p.id)');
+        $qb->andWhere('p.event = :eventId');
+        $qb->andWhere('p.user = :userId');
+        $qb->setParameter('eventId', $eventId);
+        $qb->setParameter('userId', $userId);
+        $count = $qb->getQuery()->getSingleScalarResult();
+        return $count > 0;
+    }
+    public function getParticipationById($participationId)
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->andWhere('p.id = :participationId');
+        $qb->setParameter('participationId', $participationId);
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function getCountOfParticipationsByEvent($eventId): int
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->select('COUNT(p.id)');
+        $qb->andWhere('p.event = :eventId');
+        $qb->setParameter('eventId', $eventId);
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 
     //    /**
     //     * @return Participations[] Returns an array of Participations objects
@@ -41,4 +68,12 @@ class ParticipationsRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function deleteParticipation(mixed $participationId): void
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->delete();
+        $qb->andWhere('p.id = :participationId');
+        $qb->setParameter('participationId', $participationId);
+        $qb->getQuery()->execute();
+    }
 }
