@@ -7,13 +7,18 @@ export class AuthService {
 		const {success, data} = await post<{
 			data: {
 				login: string,
-				roles: string[]
+				roles: string[],
+				email: string
 			}
 		}>('auth/login', {login, password});
 		if (!success) {
 			toast.error('Nom d\'utilisateur ou mot de passe incorrect');
 		} else {
-			userStore.user = data?.data;
+			userStore.user = {
+				login: data!.data.login,
+				email: data!.data.email,
+				roles: data!.data.roles
+			};
 			toast.success('Connexion réussie');
 		}
 		return success;
@@ -21,36 +26,44 @@ export class AuthService {
 
 	static async register(login: string, email: string, password: string) {
 		const {success, data} = await post<{
-			data: {
-				login: string,
-				roles: string[]
-			}
+			login: string,
+			email: string,
+			roles: string[]
 		}>('auth/register', {login, plainPassword: password, email, roles: []});
 		if (!success) {
 			toast.error('Erreur lors de l\'inscription');
 		} else {
 			toast.success('Inscription réussie');
-			userStore.user = data?.data;
+			userStore.user = {
+				login: data!.login,
+				email: data!.email,
+				roles: data!.roles
+			};
 		}
 		return success;
 	}
 
 	static async refreshToken() {
-		const {success, data} = await get<{
+		const {success, data} = await post<{
 			data: {
 				login: string,
+				email: string,
 				roles: string[]
 			}
 		}>('auth/refresh-token');
 		if (success) {
-			userStore.user = data?.data;
+			userStore.user = {
+				login: data!.data.login,
+				email: data!.data.email,
+				roles: data!.data.roles
+			};
 		}
 		return success;
 	}
 
 	static async logout() {
 		userStore.user = undefined;
-		const {success} = await get('auth/logout');
+		const {success} = await get('auth/token/invalidate');
 		if (!success) {
 			toast.error('Erreur lors de la déconnexion');
 		} else {

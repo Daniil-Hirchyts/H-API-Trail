@@ -37,6 +37,6 @@ export async function get<T>(endpoint: string) {
 	return request<T>('GET', endpoint);
 }
 
-export async function post<T>(endpoint: string, data: any) {
+export async function post<T>(endpoint: string, data?: any) {
 	return request<T>('POST', endpoint, data);
 }

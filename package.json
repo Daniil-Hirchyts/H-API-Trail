@@ -12,6 +12,7 @@
     "@vueuse/core": "^12.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.13",
     "lucide-vue-next": "^0.468.0",
     "radix-vue": "^1.9.11",
     "tailwind-merge": "^2.5.5",

@@ -5,6 +5,7 @@ import LoginPage from '@/views/Login.vue';
 import RegisterPage from '@/views/Register.vue';
 import RacesPage from '@/views/Races.vue';
 import ProfilePage from '@/views/Profile.vue';
+import EventPage from '@/views/Event.vue';
 import MainLayout from '@/layouts/Main-Layout.vue';
 import AuthLayout from '@/layouts/Auth-Layout.vue';
 
@@ -27,6 +28,11 @@ const routes = [
 				path: 'profile',
 				name: 'Profile',
 				component: ProfilePage
+			},
+			{
+				path: 'event/:id',
+				name: 'Event',
+				component: EventPage
 			}
 		]
 	},

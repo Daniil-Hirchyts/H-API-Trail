@@ -3,6 +3,7 @@ import {reactive} from 'vue';
 type State = {
 	user: {
 		login: string,
+		email: string
 		roles: string[]
 	} | undefined
 }
