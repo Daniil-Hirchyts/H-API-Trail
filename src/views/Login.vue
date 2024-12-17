@@ -1,8 +1,29 @@
 <script setup lang="ts">
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
+import {AuthService} from '@/lib/services/auth.service.ts';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
+
+const router = useRouter();
+const isLoading = ref(false);
+
+async function handleSubmit(e: Event) {
+  e.preventDefault();
+  const form = new FormData(e.target as HTMLFormElement);
+  const data = Object.fromEntries(form.entries()) as {
+    username: string;
+    password: string;
+  };
+  isLoading.value = true;
+  const success = await AuthService.login(data.username, data.password);
+  isLoading.value = false;
+  if (success) {
+    await router.push('/');
+  }
+}
 </script>
 
 <template>
@@ -19,21 +40,21 @@ import {Label} from '@/components/ui/label';
           Enter your email below to login to your account.
         </CardDescription>
       </CardHeader>
-      <CardContent class="grid gap-4">
-        <div class="grid gap-2">
-          <Label for="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required/>
-        </div>
-        <div class="grid gap-2">
-          <Label for="password">Password</Label>
-          <Input id="password" type="password" required/>
-        </div>
+      <CardContent>
+        <form v-on:submit="handleSubmit" class="grid gap-4">
+          <div class="grid gap-2">
+            <Label for="username">Username</Label>
+            <Input id="username" type="text" name="username" required/>
+          </div>
+          <div class="grid gap-2">
+            <Label for="password">Password</Label>
+            <Input id="password" name="password" type="password" required/>
+          </div>
+          <Button class="w-full" type="submit" :loading="isLoading">
+            Sign in
+          </Button>
+        </form>
       </CardContent>
-      <CardFooter>
-        <Button class="w-full">
-          Sign in
-        </Button>
-      </CardFooter>
     </Card>
     <div class="text-center text-sm">
       Don't have an account?

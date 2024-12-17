@@ -3,6 +3,35 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
+import {useRouter} from 'vue-router';
+import {ref} from 'vue';
+import {AuthService} from '@/lib/services/auth.service.ts';
+import {toast} from 'vue-sonner';
+
+const router = useRouter();
+const isLoading = ref(false);
+
+async function handleSubmit(e: Event) {
+  e.preventDefault();
+  const form = new FormData(e.target as HTMLFormElement);
+  const data = Object.fromEntries(form.entries()) as {
+    username: string;
+    password: string;
+    email: string;
+    confirmPassword: string;
+  };
+  console.log(data);
+  if (data.password !== data.confirmPassword) {
+    toast.error('Les mots de passe ne correspondent pas');
+    return;
+  }
+  isLoading.value = true;
+  const success = await AuthService.register(data.username, data.email, data.password);
+  isLoading.value = false;
+  if (success) {
+    await router.push('/');
+  }
+}
 </script>
 
 <template>
@@ -21,34 +50,33 @@ import {Label} from '@/components/ui/label';
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid gap-4">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="grid gap-2">
-              <Label for="first-name">First name</Label>
-              <Input id="first-name" placeholder="Max" required/>
-            </div>
-            <div class="grid gap-2">
-              <Label for="last-name">Last name</Label>
-              <Input id="last-name" placeholder="Robinson" required/>
-            </div>
+        <form v-on:submit="handleSubmit" class="grid gap-4">
+          <div class="grid gap-2">
+            <Label for="username">Username</Label>
+            <Input id="username" name="username" required/>
           </div>
           <div class="grid gap-2">
             <Label for="email">Email</Label>
             <Input
                 id="email"
                 type="email"
+                name="email"
                 placeholder="m@example.com"
                 required
             />
           </div>
           <div class="grid gap-2">
             <Label for="password">Password</Label>
-            <Input id="password" type="password"/>
+            <Input id="password" type="password" name="password"/>
           </div>
-          <Button type="submit" class="w-full">
+          <div class="grid gap-2">
+            <Label for="password">Confirm password</Label>
+            <Input id="password" type="password" name="confirmPassword"/>
+          </div>
+          <Button type="submit" class="w-full" :loading="isLoading">
             Create an account
           </Button>
-        </div>
+        </form>
       </CardContent>
     </Card>
     <div class="text-center text-sm">

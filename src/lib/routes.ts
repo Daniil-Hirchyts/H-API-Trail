@@ -4,6 +4,7 @@ import HomePage from '@/views/Home.vue';
 import LoginPage from '@/views/Login.vue';
 import RegisterPage from '@/views/Register.vue';
 import RacesPage from '@/views/Races.vue';
+import ProfilePage from '@/views/Profile.vue';
 import MainLayout from '@/layouts/Main-Layout.vue';
 import AuthLayout from '@/layouts/Auth-Layout.vue';
 
@@ -21,6 +22,11 @@ const routes = [
 				path: 'races',
 				name: 'Races',
 				component: RacesPage
+			},
+			{
+				path: 'profile',
+				name: 'Profile',
+				component: ProfilePage
 			}
 		]
 	},

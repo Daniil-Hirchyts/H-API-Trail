@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {Medal} from 'lucide-vue-next';
 import {Button} from '@/components/ui/button';
+import {userStore} from '@/stores/user.store.ts';
+import {AuthService} from '@/lib/services/auth.service.ts';
 </script>
 
 <template>
@@ -28,13 +30,21 @@ import {Button} from '@/components/ui/button';
         Races
       </router-link>
     </nav>
-    <div class="flex gap-4">
-      <router-link to="/login">
-        <Button variant="ghost">Login</Button>
-      </router-link>
-      <router-link to="/register">
-        <Button>Register</Button>
-      </router-link>
+    <div class="flex gap-4 items-center">
+      <template v-if="!userStore.user">
+        <router-link to="/login">
+          <Button variant="ghost">Login</Button>
+        </router-link>
+        <router-link to="/register">
+          <Button>Register</Button>
+        </router-link>
+      </template>
+      <template v-else>
+        <span class="text-sm text-muted-foreground">
+          {{ userStore.user?.login }}
+        </span>
+        <Button variant="ghost" v-on:click="AuthService.logout">Logout</Button>
+      </template>
     </div>
   </header>
 </template>
