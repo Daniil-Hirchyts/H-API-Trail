@@ -6,6 +6,7 @@ import RegisterPage from '@/views/Register.vue';
 import RacesPage from '@/views/Races.vue';
 import ProfilePage from '@/views/Profile.vue';
 import EventPage from '@/views/Event.vue';
+import NotFoundPage from '@/views/NotFound.vue';
 import MainLayout from '@/layouts/Main-Layout.vue';
 import AuthLayout from '@/layouts/Auth-Layout.vue';
 
@@ -50,6 +51,12 @@ const routes = [
 				name: 'Register',
 				component: RegisterPage
 			}]
+	},
+	// 404
+	{
+		path: '/:pathMatch(.*)*',
+		name: 'NotFound',
+		component: NotFoundPage
 	}
 ];
 

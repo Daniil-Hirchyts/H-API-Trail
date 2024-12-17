@@ -7,9 +7,17 @@ import {useRouter} from 'vue-router';
 import {ref} from 'vue';
 import {AuthService} from '@/lib/services/auth.service.ts';
 import {toast} from 'vue-sonner';
+import {getAnnuaireUserData} from '@/lib/annuaire-api.ts';
 
 const router = useRouter();
 const isLoading = ref(false);
+const code = ref('');
+
+async function getUserData() {
+  if (code.value !== '') {
+    await getAnnuaireUserData(code.value);
+  }
+}
 
 async function handleSubmit(e: Event) {
   e.preventDefault();
@@ -40,7 +48,7 @@ async function handleSubmit(e: Event) {
       <router-link to="/">Retour</router-link>
     </Button>
 
-    <Card class="mx-auto max-w-md">
+    <Card class="max-w-md w-full">
       <CardHeader>
         <CardTitle class="text-xl">
           Sign Up
@@ -50,6 +58,15 @@ async function handleSubmit(e: Event) {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div class="flex flex-col gap-4 pb-8">
+          <div class="grid gap-2">
+            <Label for="code">Code</Label>
+            <Input id="code" :value="code" @input="code = $event.target.value"/>
+          </div>
+          <Button @click="getUserData" class="w-full" :loading="isLoading">
+            Récuperer mes informations
+          </Button>
+        </div>
         <form v-on:submit="handleSubmit" class="grid gap-4">
           <div class="grid gap-2">
             <Label for="username">Username</Label>
