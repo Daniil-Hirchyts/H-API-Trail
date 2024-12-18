@@ -7,9 +7,14 @@ export async function getAnnuaireUserData(code: string) {
 			toast.error('Erreur lors de la récupération des données');
 		}
 		const data = await response.json();
-		console.log(data);
+		toast.success('Données récupérées');
+		return {
+			email: data.email,
+			username: data.username
+		};
 	} catch (e) {
 		console.error(e);
 		toast.error('Erreur lors de la récupération des données');
 	}
+	return null;
 }
