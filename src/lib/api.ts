@@ -21,7 +21,7 @@ async function request<T>(method: string, endpoint: string, data?: any): Promise
 		return {
 			success: response.ok,
 			status: response.status,
-			data: await response.json(),
+			data: response.status === 204 ? undefined : await response.json(),
 			response
 		};
 	} catch (error) {

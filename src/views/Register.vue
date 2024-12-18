@@ -97,8 +97,7 @@ async function handleSubmit(e: Event) {
         <form v-on:submit="handleSubmit" class="grid gap-4">
           <div class="grid gap-2">
             <Label for="username">Username</Label>
-            <Input id="username" name="username" required minlength="4" maxlength="30" :value="username"
-                   @input="username = $event.target.value"/>
+            <Input id="username" name="username" required minlength="4" maxlength="20" v-model="username"/>
             <span class="text-red-500 text-sm" v-if="violations.login">{{ violations.login }}</span>
           </div>
           <div class="grid gap-2">
@@ -109,8 +108,7 @@ async function handleSubmit(e: Event) {
                 name="email"
                 placeholder="m@example.com"
                 required
-                :value="email"
-                @input="email = $event.target.value"
+                v-model="email"
             />
             <span class="text-red-500 text-sm" v-if="violations.email">{{ violations.email }}</span>
           </div>

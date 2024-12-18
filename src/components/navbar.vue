@@ -3,6 +3,7 @@ import {Medal} from 'lucide-vue-next';
 import {Button} from '@/components/ui/button';
 import {userStore} from '@/stores/user.store.ts';
 import {AuthService} from '@/lib/services/auth.service.ts';
+import NewEventDialog from '@/components/new-event-dialog.vue';
 </script>
 
 <template>
@@ -31,6 +32,7 @@ import {AuthService} from '@/lib/services/auth.service.ts';
         <span class="text-sm text-muted-foreground">
           {{ userStore.user?.login }}
         </span>
+        <NewEventDialog/>
         <Button variant="ghost" v-on:click="AuthService.logout">Logout</Button>
       </template>
     </div>
