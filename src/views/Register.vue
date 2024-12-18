@@ -37,7 +37,7 @@ async function handleSubmit(e: Event) {
   const success = await AuthService.register(data.username, data.email, data.password);
   isLoading.value = false;
   if (success) {
-    await router.push('/');
+    await router.push('/login');
   }
 }
 </script>
