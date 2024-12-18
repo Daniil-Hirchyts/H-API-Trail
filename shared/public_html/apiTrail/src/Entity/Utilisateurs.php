@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -14,7 +13,6 @@ use App\State\ChangeRoleProcessor;
 use App\State\UtilisateursProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -29,65 +27,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ApiResource(
     operations: [
-        new GetCollection(
-            description: 'Récupère les utilisateurs',
-            security: 'is_granted("ROLE_ADMIN")',
-        ),
+        new GetCollection(description: 'Récupère les utilisateurs', security: 'is_granted("ROLE_ADMIN")'),
+        new Get(description: 'Récupère un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")'),
+        new Delete(description: 'Supprime un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")'),
+        new Patch(description: 'Met à jour un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")'),
+        new Patch(uriTemplate: '/utilisateurs/{id}/changeRole', description: "Changer le role d'un utilisateur", denormalizationContext: ['groups' => ['utilisateur:read:role']], security: 'is_granted("ROLE_ADMIN") and is_granted("CHANGER_ROLES", object)', processor: ChangeRoleProcessor::class),
+        new Post(uriTemplate: '/auth/register', inputFormats: ['json' => ['application/json']], description: 'Crée un utilisateur', normalizationContext: ['groups' => ['utilisateur:none']], denormalizationContext: ['groups' => ['utilisateur:register']], validationContext: ['groups' => ['Default', 'utilisateur:register']], output: false, processor: UtilisateursProcessor::class),
     ],
     normalizationContext: ['groups' => ['allutilisateur:read']],
     denormalizationContext: ['groups' => ['allutilisateur:write']],
     validationContext: ['groups' => ['Default', 'allutilisateur:write']],
-)]
-#[ApiResource(
-    operations: [
-        new Get(
-            description: 'Récupère un utilisateur',
-            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
-        ),
-        ],
-    normalizationContext: ['groups' => ['infoutilisateur:read']],
-    denormalizationContext: ['groups' => ['infoutilisateur:write']],
-    validationContext: ['groups' => ['Default', 'infoutilisateur:write']],
-)]
-#[ApiResource(
-    operations: [
-        new Delete(
-            description: 'Supprime un utilisateur',
-            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
-        ),
-    ],
-)]
-#[ApiResource(
-    operations: [
-        new Patch(
-            description: 'Met à jour un utilisateur',
-            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
-        ),
-    ],
-    normalizationContext: ['groups' => ['updateutilisateur:read']],
-    denormalizationContext: ['groups' => ['updateutilisateur:write']],
-    validationContext: ['groups' => ['Default', 'updateutilisateur:write']],
-)]
-#[ApiResource(
-    operations: [
-        new Post(
-            uriTemplate: '/auth/register',
-            description: 'Crée un utilisateur',
-            denormalizationContext: ['groups' => ['utilisateur:create']],
-            validationContext: ['groups' => ['Default', 'utilisateur:create']],
-            processor: UtilisateursProcessor::class,
-        ),
-        new Patch(
-            uriTemplate: '/utilisateurs/{id}/changeRole',
-            description: "Changer le role d'un utilisateur",
-            denormalizationContext: ['groups' => ['utilisateur:read:role']],
-            security: 'is_granted("ROLE_ADMIN") and is_granted("CHANGER_ROLES", object)',
-            validationContext: ['groups' => ['Default', 'utilisateur:read:role']],
-            processor: ChangeRoleProcessor::class,
-        ),
-    ],
-    normalizationContext: ['groups' => ['utilisateur:read','participation:event:read']],
-    denormalizationContext: ['groups' => ['utilisateur:write']],
 )]
 #[ORM\HasLifecycleCallbacks]
 class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
@@ -99,9 +48,9 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Assert\NotBlank(groups: ['utilisateur:create'])]
+    #[Assert\NotBlank(groups: ['utilisateur:register'])]
     #[Assert\Length(min: 4, max: 20, minMessage: 'Il faut au moins 4 caractères pour le login!', maxMessage: 'Il faut moins de 20 caractères pour le login!')]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:create','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:register','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -117,58 +66,37 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(groups: ['utilisateur:create'])]
-    #[Assert\NotNull(groups: ['utilisateur:create'])]
+    #[Assert\NotBlank(groups: ['utilisateur:register'])]
+    #[Assert\NotNull(groups: ['utilisateur:register'])]
     #[Assert\Email(message: 'L\'adresse email n\'est pas valide')]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:register', 'utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[ApiProperty(readable: false, writable: false)]
     private ?string $hash = null;
 
     #[ORM\Column]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:register', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role','allutilisateur:read','infoutilisateur:read'])]
     private array $roles = [];
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ApiProperty(readable: false)]
+    #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ApiProperty(readable: false)]
+    #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $updated_at = null;
 
-    #[ApiProperty(readable: false)]
-    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.", groups: ['utilisateur:create'])]
-    #[Assert\NotNull(groups: ['utilisateur:create'])]
-    #[Assert\Length(
-        min: 8,
-        max: 30,
-        minMessage: "Il faut au moins 8 caractères pour le mdp!",
-        maxMessage: "Il faut moins de 30 caractères pour le mdp!",
-        groups: ['utilisateur:create']
-    )]
-    #[Assert\Regex(
-        pattern: '#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,30}$#',
-        message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial',
-        groups: ['utilisateur:create']
-    )]
-    #[Groups(['utilisateur:create', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.", groups: ['utilisateur:register'])]
+    #[Assert\NotNull(groups: ['utilisateur:register'])]
+    #[Assert\Length(min: 8, max: 30, minMessage: "Il faut au moins 8 caractères pour le mdp!", maxMessage: "Il faut moins de 30 caractères pour le mdp!", groups: ['utilisateur:create'])]
+    #[Assert\Regex(pattern: '#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,30}$#', message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial', groups: ['utilisateur:create'])]
+    #[Groups(['utilisateur:register', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
     private ?string $plainPassword = null;
 
-
-    /**
-     * @var Collection<int, Events>
-     */
-    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', cascade: ['persist'],orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', cascade: ['persist'], orphanRemoval: true)]
     #[Groups(['updateutilisateur:read','utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
     private Collection $events;
 
-    /**
-     * @var Collection<int, Participations>
-     */
-    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user', cascade: ['persist'],orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user', cascade: ['persist'], orphanRemoval: true)]
     #[Groups(['updateutilisateur:read','utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
     private Collection $participations;
 
@@ -222,7 +150,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -234,7 +161,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
-
         return $this;
     }
 
@@ -246,7 +172,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTelephone(string $telephone): static
     {
         $this->telephone = $telephone;
-
         return $this;
     }
 
@@ -258,7 +183,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -270,7 +194,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setHash(string $hash): static
     {
         $this->hash = $hash;
-
         return $this;
     }
 
@@ -292,19 +215,13 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
@@ -316,7 +233,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
-
         return $this;
     }
 
@@ -328,7 +244,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
-
         return $this;
     }
 
@@ -342,9 +257,6 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->login;
     }
 
-    /**
-     * @return Collection<int, Events>
-     */
     public function getEvents(): Collection
     {
         return $this->events;
@@ -356,25 +268,17 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
             $this->events->add($event);
             $event->setOrganizedBy($this);
         }
-
         return $this;
     }
 
     public function removeEvent(Events $event): static
     {
-        if ($this->events->removeElement($event)) {
-            // set the owning side to null (unless already changed)
-            if ($event->getOrganizedBy() === $this) {
-                $event->setOrganizedBy(null);
-            }
+        if ($this->events->removeElement($event) && $event->getOrganizedBy() === $this) {
+            $event->setOrganizedBy(null);
         }
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Participations>
-     */
     public function getParticipations(): Collection
     {
         return $this->participations;
@@ -386,19 +290,14 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
             $this->participations->add($participations);
             $participations->setUserId($this);
         }
-
         return $this;
     }
 
     public function removeParticipations(Participations $participations): static
     {
-        if ($this->participations->removeElement($participations)) {
-            // set the owning side to null (unless already changed)
-            if ($participations->getUserId() === $this) {
-                $participations->setUserId(null);
-            }
+        if ($this->participations->removeElement($participations) && $participations->getUserId() === $this) {
+            $participations->setUserId(null);
         }
-
         return $this;
     }
 
