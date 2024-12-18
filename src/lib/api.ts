@@ -15,6 +15,7 @@ async function request<T>(method: string, endpoint: string, data?: any): Promise
 			headers: {
 				'Content-Type': 'application/json'
 			},
+			credentials: 'include',
 			body: data ? JSON.stringify(data) : undefined
 		});
 		return {

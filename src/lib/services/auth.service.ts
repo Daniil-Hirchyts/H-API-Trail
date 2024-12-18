@@ -1,4 +1,4 @@
-import {get, post} from '@/lib/api.ts';
+import {post} from '@/lib/api.ts';
 import {toast} from 'vue-sonner';
 import {userStore} from '@/stores/user.store.ts';
 
@@ -50,7 +50,7 @@ export class AuthService {
 				email: string,
 				roles: string[]
 			}
-		}>('auth/refresh-token');
+		}>('token/refresh');
 		if (success) {
 			userStore.user = {
 				login: data!.data.login,
@@ -63,7 +63,7 @@ export class AuthService {
 
 	static async logout() {
 		userStore.user = undefined;
-		const {success} = await get('auth/token/invalidate');
+		const {success} = await post('token/invalidate');
 		if (!success) {
 			toast.error('Erreur lors de la déconnexion');
 		} else {
