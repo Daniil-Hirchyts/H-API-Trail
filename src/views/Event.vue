@@ -3,20 +3,22 @@ import dayjs from 'dayjs';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
-import {EventService, SportType} from '@/lib/services/event.service.ts';
 import {useRoute, useRouter} from 'vue-router';
-import {ref} from 'vue';
+import {ref, onMounted} from 'vue';
+import {eventStore} from '@/stores/event.store';
 
-const event = ref<SportType | null>(null);
+const event = ref(null);
 
 const route = useRoute();
 const router = useRouter();
-EventService.get(route.params.id.toString()).then(data => {
-  if (!data) {
-    router.push('/404');
+
+onMounted(async () => {
+  const fetchedEvent = await eventStore.getEventById(route.params.id.toString());
+  if (!fetchedEvent) {
+    await router.push('/404');
     return;
   }
-  event.value = data;
+  event.value = fetchedEvent;
 });
 </script>
 
