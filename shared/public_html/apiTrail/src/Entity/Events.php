@@ -22,8 +22,7 @@ use Symfony\Flex\Unpack\Operation;
 #[ApiResource(
     operations: [
         new GetCollection(
-            description: "Récupère les events",
-            security: "is_granted('ROLE_USER')",
+            description: "Récupère les events"
         ),
         new GetCollection(
             uriTemplate: '/utilisateurs/{idOrga}/events',
