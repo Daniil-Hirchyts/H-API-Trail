@@ -24,15 +24,18 @@ export class AuthService {
 		return success;
 	}
 
-	static async register(login: string, email: string, password: string) {
-		const {success, data} = await post<any>('auth/register', {login, plainPassword: password, email, roles: []});
-		if (!success) {
-			toast.error('Erreur lors de l\'inscription');
-		} else {
-			toast.success('Inscription réussie, vous pouvez maintenant vous connecter');
-		}
-		return {success, data};
+	static async register(login: string, email: string, password: string, roles: string[]) {
+		const { success, data } = await post<any>('auth/register', {
+			login,
+			plainPassword: password,
+			email,
+			roles,
+		});
+		if (!success) toast.error('Erreur lors de l\'inscription');
+		else toast.success('Inscription réussie, vous pouvez maintenant vous connecter');
+		return { success, data };
 	}
+
 
 	static async refreshToken() {
 		const {success, data} = await post<{

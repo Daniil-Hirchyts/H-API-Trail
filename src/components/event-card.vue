@@ -14,7 +14,7 @@ defineProps({
 
 <template>
   <router-link :to="'/event/' + event.id" class="group">
-    <Card class="group-hover:shadow-lg transition-all duration-150">
+    <Card class="group-hover:shadow-lg transition-all duration-150 motion-translate-x-in-[0%] motion-translate-y-in-[10%] motion-opacity-in-[0%] motion-blur-in-[8px] motion-duration-[500ms]/opacity">
       <CardHeader>
         <CardTitle>{{ event.name }}</CardTitle>
         <CardDescription>{{ dayjs(event.start_at).format('DD/MM/YYYY HH:mm') }} au

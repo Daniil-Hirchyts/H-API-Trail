@@ -3,23 +3,18 @@ import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {AuthService} from '@/lib/services/auth.service.ts';
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {userStore} from "@/stores/user.store.ts";
 
 const router = useRouter();
-const isLoading = ref(false);
+const username = ref('');
+const password = ref('');
+const loading = computed(() => userStore.loading);
 
 async function handleSubmit(e: Event) {
   e.preventDefault();
-  const form = new FormData(e.target as HTMLFormElement);
-  const data = Object.fromEntries(form.entries()) as {
-    username: string;
-    password: string;
-  };
-  isLoading.value = true;
-  const success = await AuthService.login(data.username, data.password);
-  isLoading.value = false;
+  const success = await userStore.login(username.value, password.value);
   if (success) {
     await router.push('/');
   }
@@ -44,13 +39,13 @@ async function handleSubmit(e: Event) {
         <form v-on:submit="handleSubmit" class="grid gap-4">
           <div class="grid gap-2">
             <Label for="username">Username</Label>
-            <Input id="username" type="text" name="username" required/>
+            <Input id="username" v-model="username" required/>
           </div>
           <div class="grid gap-2">
             <Label for="password">Password</Label>
-            <Input id="password" name="password" type="password" required/>
+            <Input id="password" type="password" v-model="password" required/>
           </div>
-          <Button class="w-full" type="submit" :loading="isLoading">
+          <Button type="submit" :loading="loading" class="w-full">
             Sign in
           </Button>
         </form>

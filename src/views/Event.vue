@@ -4,26 +4,31 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {useRoute, useRouter} from 'vue-router';
-import {ref, onMounted} from 'vue';
+import {computed, onMounted} from 'vue';
 import {eventStore} from '@/stores/event.store';
-
-const event = ref(null);
+import {Loader} from "@/components/ui/loader";
 
 const route = useRoute();
 const router = useRouter();
 
+const event = computed(() => eventStore.events.find(e => e.id.toString() === route.params.id.toString()));
+const loading = computed(() => eventStore.loading);
+
 onMounted(async () => {
-  const fetchedEvent = await eventStore.getEventById(route.params.id.toString());
-  if (!fetchedEvent) {
-    await router.push('/404');
-    return;
+  if (!event.value) {
+    const fetchedEvent = await eventStore.getEventById(route.params.id.toString());
+    if (!fetchedEvent) {
+      router.push('/404');
+    }
   }
-  event.value = fetchedEvent;
 });
 </script>
 
 <template>
-  <Card v-if="event" class="group-hover:shadow-lg transition-all duration-150">
+  <div v-if="loading" class="flex justify-center items-center h-80">
+    <Loader />
+  </div>
+  <Card v-else-if="event" class="group-hover:shadow-lg transition-all duration-150 ">
     <CardHeader class="relative">
       <CardTitle>{{ event.name }}</CardTitle>
       <CardDescription>{{ dayjs(event.start_at).format('DD/MM/YYYY HH:mm') }} au
@@ -43,4 +48,5 @@ onMounted(async () => {
       <p>{{ event.description }}</p>
     </CardContent>
   </Card>
+  <p v-else class="text-center">Event not found</p>
 </template>

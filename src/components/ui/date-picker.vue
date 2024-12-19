@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, watch } from 'vue'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import {defineEmits, defineProps, ref, watch} from 'vue'
+import {Popover, PopoverContent, PopoverTrigger,} from '@/components/ui/popover'
 
 import {
   RangeCalendarCell,
@@ -16,21 +12,13 @@ import {
   RangeCalendarHeadCell,
 } from '@/components/ui/range-calendar'
 
-import {
-  CalendarDate,
-  type DateValue,
-  isEqualMonth,
-} from '@internationalized/date'
+import {CalendarDate, type DateValue, isEqualMonth,} from '@internationalized/date'
 
-import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-vue-next'
+import {Calendar as CalendarIcon, ChevronLeft, ChevronRight,} from 'lucide-vue-next'
 
-import { type DateRange, RangeCalendarRoot, useDateFormatter } from 'radix-vue'
-import { createMonth, type Grid, toDate } from 'radix-vue/date'
-import { cn } from "@/lib/utils.ts";
+import {type DateRange, RangeCalendarRoot, useDateFormatter} from 'radix-vue'
+import {createMonth, type Grid, toDate} from 'radix-vue/date'
+import {cn} from "@/lib/utils.ts";
 
 // Accept modelValue with optional start/end
 const props = defineProps({

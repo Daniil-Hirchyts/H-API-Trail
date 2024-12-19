@@ -89,7 +89,7 @@ const settings = {
             },
         },
     },
-    plugins: [animate],
+    plugins: [require('tailwindcss-animate'), require('tailwindcss-motion')],
 }
 
 export default settings

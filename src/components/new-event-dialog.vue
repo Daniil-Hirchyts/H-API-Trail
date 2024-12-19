@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
@@ -16,15 +9,14 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {ref} from "vue";
 import {post} from '@/lib/api';
 import {toast} from 'vue-sonner';
-import { eventStore } from '@/stores/event.store';
-import { EventService, ApiSportType } from '@/lib/services/event.service';
+import {eventStore} from '@/stores/event.store';
+import {ApiSportType, EventService} from '@/lib/services/event.service';
 
 const dateRange = ref({
   start: null,
   end: null,
 });
 
-// Control dialog state
 const openDialog = ref(false);
 
 async function handleSubmit(e: Event) {
@@ -63,13 +55,8 @@ async function handleSubmit(e: Event) {
 
     if (success && data) {
       toast.success('Événement créé avec succès!');
-      // Parse the returned API data into SportType
       const newEvent = EventService['parseSport'](data as ApiSportType);
-
-      // Add the new event to the store
       eventStore.addEvent(newEvent);
-
-      // Close the dialog
       openDialog.value = false;
     } else {
       toast.error('Erreur lors de la création de l\'événement');
