@@ -13,7 +13,6 @@ watchEffect(() => {
   }
 });
 
-userStore.initializeUser();
 </script>
 
 <template>
