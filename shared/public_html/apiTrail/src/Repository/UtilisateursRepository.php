@@ -21,12 +21,21 @@ class UtilisateursRepository extends ServiceEntityRepository implements Password
 
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        if (!$user instanceof Utilisateur) {
+        if (!$user instanceof Utilisateurs) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
         }
 
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    public function deleteUser($userId): void
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->delete();
+        $qb->andWhere('u.id = :userId');
+        $qb->setParameter('userId', $userId);
+        $qb->getQuery()->execute();
     }
 
     //    /**

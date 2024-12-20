@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UtilisateursRepository;
 use App\State\ChangeRoleProcessor;
+use App\State\DeleteUserProcessor;
 use App\State\UtilisateursProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -29,8 +30,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(description: 'Récupère les utilisateurs', security: 'is_granted("ROLE_ADMIN")'),
         new Get(description: 'Récupère un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")'),
-        new Delete(description: 'Supprime un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")'),
-        new Patch(description: 'Met à jour un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")'),
+        new Delete(description: 'Supprime un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")', processor:DeleteUserProcessor::class),
+        new Patch(description: 'Met à jour un utilisateur', normalizationContext: ['groups' => ['utilisateur:update']], denormalizationContext: ['groups' => ['utilisateur:update']],
+            security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
+            validationContext: ['groups' => ['Default', 'utilisateur:update']],),
         new Patch(uriTemplate: '/utilisateurs/{id}/changeRole', description: "Changer le role d'un utilisateur", denormalizationContext: ['groups' => ['utilisateur:read:role']], security: 'is_granted("ROLE_ADMIN") and is_granted("CHANGER_ROLES", object)', processor: ChangeRoleProcessor::class),
         new Post(uriTemplate: '/auth/register', inputFormats: ['json' => ['application/json']], description: 'Crée un utilisateur', normalizationContext: ['groups' => ['utilisateur:none']], denormalizationContext: ['groups' => ['utilisateur:register']], validationContext: ['groups' => ['Default', 'utilisateur:register']], output: false, processor: UtilisateursProcessor::class),
     ],
@@ -44,39 +47,39 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:read', 'participation:event:read','participation:utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:read', 'participation:event:read', 'participation:utilisateur:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(groups: ['utilisateur:register'])]
     #[Assert\Length(min: 4, max: 20, minMessage: 'Il faut au moins 4 caractères pour le login!', maxMessage: 'Il faut moins de 20 caractères pour le login!')]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:register','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:register', 'utilisateur:read', 'participation:event:read', 'participation:utilisateur:read', 'participation:utilisateur:event:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private ?string $login = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:update', 'utilisateur:read', 'participation:event:read', 'participation:utilisateur:read', 'participation:utilisateur:event:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:update', 'utilisateur:read', 'participation:event:read', 'participation:utilisateur:read', 'participation:utilisateur:event:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:update', 'utilisateur:read', 'participation:event:read', 'participation:utilisateur:read', 'participation:utilisateur:event:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(groups: ['utilisateur:register'])]
     #[Assert\NotNull(groups: ['utilisateur:register'])]
     #[Assert\Email(message: 'L\'adresse email n\'est pas valide')]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:register', 'utilisateur:update','utilisateur:read', 'participation:event:read','participation:utilisateur:read','participation:utilisateur:event:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:register', 'utilisateur:update', 'utilisateur:read', 'participation:event:read', 'participation:utilisateur:read', 'participation:utilisateur:event:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private ?string $email = null;
 
     #[ORM\Column]
     private ?string $hash = null;
 
     #[ORM\Column]
-    #[Groups(['infoparticipation:read','updateutilisateur:read','utilisateur:register', 'utilisateur:update','utilisateur:read', 'participation:event:read', 'utilisateur:read:role','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['infoparticipation:read', 'updateutilisateur:read', 'utilisateur:register', 'utilisateur:update', 'utilisateur:read', 'participation:event:read', 'utilisateur:read:role', 'allutilisateur:read', 'infoutilisateur:read'])]
     private array $roles = [];
 
     #[ORM\Column(type: 'datetime')]
@@ -89,15 +92,15 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull(groups: ['utilisateur:register'])]
     #[Assert\Length(min: 8, max: 30, minMessage: "Il faut au moins 8 caractères pour le mdp!", maxMessage: "Il faut moins de 30 caractères pour le mdp!", groups: ['utilisateur:create'])]
     #[Assert\Regex(pattern: '#^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\w\W]{8,30}$#', message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial', groups: ['utilisateur:create'])]
-    #[Groups(['utilisateur:register', 'utilisateur:update','utilisateur:read', 'participation:event:read'])]
+    #[Groups(['utilisateur:register', 'utilisateur:update', 'utilisateur:read', 'participation:event:read'])]
     private ?string $plainPassword = null;
 
     #[ORM\OneToMany(targetEntity: Events::class, mappedBy: 'organized_by', cascade: ['persist'], orphanRemoval: true)]
-    #[Groups(['updateutilisateur:read','utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['updateutilisateur:read', 'utilisateur:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private Collection $events;
 
     #[ORM\OneToMany(targetEntity: Participations::class, mappedBy: 'user', cascade: ['persist'], orphanRemoval: true)]
-    #[Groups(['updateutilisateur:read','utilisateur:read','allutilisateur:read','infoutilisateur:read'])]
+    #[Groups(['updateutilisateur:read', 'utilisateur:read', 'allutilisateur:read', 'infoutilisateur:read'])]
     private Collection $participations;
 
     public function __construct()
