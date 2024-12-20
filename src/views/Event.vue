@@ -30,7 +30,7 @@ onMounted(async () => {
     <Loader />
   </div>
 
-  <div v-else-if="event" class="flex flex-col items-center">
+  <div v-else-if="event" class="flex flex-col items-center motion-translate-x-in-[0%] motion-translate-y-in-[10%] motion-opacity-in-[0%] motion-blur-in-[8px] motion-duration-[500ms]/opacity">
     <div class="w-full max-w-4xl bg-gradient-to-r from-lime-300 via-lime-200 to-lime-100 rounded-lg shadow-lg p-6 text-white mb-6">
       <div class="flex justify-between items-start">
         <div>
