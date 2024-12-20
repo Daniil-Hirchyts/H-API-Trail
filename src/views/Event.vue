@@ -16,6 +16,7 @@ const router = useRouter();
 const event = computed(() => eventStore.events.find((e) => e.id.toString() === route.params.id.toString()));
 const loading = computed(() => eventStore.loading);
 const loadingAction = ref(false);
+const initialized = computed(() => userStore.initialized);
 
 const isParticipating = computed(() => {
   return event.value?.participations.some(
@@ -90,8 +91,8 @@ async function toggleParticipation() {
               {{ sport }}
             </Badge>
           </div>
-          <div class="w-full max-w-4xl flex justify-end mt-6">
-            <Button variant="destructive" @click="toggleParticipation" :loading="loadingAction">
+          <div class="w-full max-w-4xl flex justify-end mt-6" >
+            <Button variant="destructive" v-if="initialized" @click="toggleParticipation" :loading="loadingAction">
               {{ isParticipating ? 'Annuler participation' : 'Participer' }}
             </Button>
           </div>

@@ -14,6 +14,7 @@ type Actions = {
 	getEventById: (id: string) => Promise<SportType | null>;
 	participate: (id: number) => void;
 	removeParticipation: (id: number) => void;
+	createEvent: (eventData: Partial<SportType>) => Promise<SportType | null>;
 };
 
 export const eventStore = reactive<State & Actions>({
@@ -79,6 +80,15 @@ export const eventStore = reactive<State & Actions>({
 			}
 			return event;
 		});
+	},
+
+	async createEvent(eventData: Partial<SportType>): Promise<SportType | null> {
+		const newEvent = await EventService.create(eventData);
+		if (newEvent) {
+			this.addEvent(newEvent);
+			return newEvent;
+		}
+		return null;
 	},
 });
 
