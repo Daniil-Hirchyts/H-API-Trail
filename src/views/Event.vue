@@ -6,7 +6,8 @@ import {Button} from '@/components/ui/button';
 import {useRoute, useRouter} from 'vue-router';
 import {computed, onMounted} from 'vue';
 import {eventStore} from '@/stores/event.store';
-import {Loader} from "@/components/ui/loader";
+import {Loader} from '@/components/ui/loader';
+import {EventService} from '@/lib/services/event.service.ts';
 
 const route = useRoute();
 const router = useRouter();
@@ -22,11 +23,12 @@ onMounted(async () => {
     }
   }
 });
+
 </script>
 
 <template>
   <div v-if="loading" class="flex justify-center items-center h-80">
-    <Loader />
+    <Loader/>
   </div>
   <Card v-else-if="event" class="group-hover:shadow-lg transition-all duration-150 ">
     <CardHeader class="relative">
@@ -40,7 +42,7 @@ onMounted(async () => {
         <Badge variant="secondary">{{ event.max_participants }} participants</Badge>
         <Badge variant="secondary">{{ event.price }}€</Badge>
       </div>
-      <Button class="absolute top-6 right-6">
+      <Button @click="EventService.participate(event.id)" class="absolute top-6 right-6">
         Participate
       </Button>
     </CardHeader>

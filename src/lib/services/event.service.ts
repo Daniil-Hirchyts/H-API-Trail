@@ -1,5 +1,6 @@
-import {get} from '@/lib/api.ts';
+import {get, post} from '@/lib/api.ts';
 import {toast} from 'vue-sonner';
+import {userStore} from '@/stores/user.store.ts';
 
 export type ApiSportType = {
 	id: number,
@@ -34,7 +35,6 @@ export type SportType = {
 	end_at: Date,
 	sport: string
 }
-
 
 export class EventService {
 	private static parseSport(data: ApiSportType): SportType {
@@ -79,6 +79,21 @@ export class EventService {
 			return null;
 		} else {
 			return this.parseSport(data!);
+		}
+	}
+
+	static async participate(id: number) {
+		if (!userStore.isLoggedIn()) {
+			toast.error('Vous devez être connecté pour participer à un événement');
+			return;
+		}
+		const {success} = await post('participations', {
+			event: id.toString()
+		});
+		if (!success) {
+			toast.error('Erreur lors de l\'inscription à l\'événement');
+		} else {
+			toast.success('Inscription réussie');
 		}
 	}
 }
