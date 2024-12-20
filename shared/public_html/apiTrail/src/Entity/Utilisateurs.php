@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(description: 'Supprime un utilisateur', security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")', processor:DeleteUserProcessor::class),
         new Patch(description: 'Met à jour un utilisateur', normalizationContext: ['groups' => ['utilisateur:update']], denormalizationContext: ['groups' => ['utilisateur:update']],
             security: '(is_granted("ROLE_USER") and object.getOwner() == user) or is_granted("ROLE_ADMIN")',
-            validationContext: ['groups' => ['Default', 'utilisateur:update']],),
+            validationContext: ['groups' => ['Default', 'utilisateur:update']], processor: UtilisateursProcessor::class),
         new Patch(uriTemplate: '/utilisateurs/{id}/changeRole', description: "Changer le role d'un utilisateur", denormalizationContext: ['groups' => ['utilisateur:read:role']], security: 'is_granted("ROLE_ADMIN") and is_granted("CHANGER_ROLES", object)', processor: ChangeRoleProcessor::class),
         new Post(uriTemplate: '/auth/register', inputFormats: ['json' => ['application/json']], description: 'Crée un utilisateur', normalizationContext: ['groups' => ['utilisateur:none']], denormalizationContext: ['groups' => ['utilisateur:register']], validationContext: ['groups' => ['Default', 'utilisateur:register']], output: false, processor: UtilisateursProcessor::class),
     ],
