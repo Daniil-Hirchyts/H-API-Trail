@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {useRoute, useRouter} from 'vue-router';
@@ -52,6 +52,13 @@ onMounted(async () => {
     </CardHeader>
     <CardContent>
       <p>{{ event.description }}</p>
+      <h2 class="text-lg font-bold py-2">Participants</h2>
+      <div class="flex flex-col">
+        <div v-for="participation in event.participations" :key="participation.user.id" class="flex gap-8">
+          <p>Login: {{ participation.user.login }}</p>
+          <p>Email: {{ participation.user.email }}</p>
+        </div>
+      </div>
     </CardContent>
   </Card>
   <p v-else class="text-center">Event not found</p>
