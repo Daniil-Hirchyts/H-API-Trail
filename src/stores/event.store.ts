@@ -11,6 +11,7 @@ type Actions = {
     addEvent: (event: SportType) => void;
     loadEvents: () => Promise<void>;
     getEventById: (id: string) => Promise<SportType | null>;
+    createEvent: (eventData: Partial<SportType>) => Promise<SportType | null>;
 };
 
 export const eventStore = reactive<State & Actions>({
@@ -48,5 +49,66 @@ export const eventStore = reactive<State & Actions>({
         }
         this.loading = false;
         return event;
-    }
+    },
+
+    async createEvent(eventData: Partial<SportType>): Promise<SportType | null> {
+        const newEvent = await EventService.create(eventData);
+        if (newEvent) {
+            this.addEvent(newEvent);
+            return newEvent;
+        }
+        return null;
+    },
 });
+
+
+export const sports: string[] = [
+    "Football",
+    "Rugby",
+    "Handball",
+    "Volleyball",
+    "Badminton",
+    "Tennis",
+    "Natation",
+    "Basketball",
+    "Cycling",
+    "Running",
+    "Swimming",
+    "Boxing",
+    "Wrestling",
+    "Judo",
+    "Karate",
+    "Taekwondo",
+    "Fencing",
+    "Archery",
+    "Shooting",
+    "Rowing",
+    "Canoeing",
+    "Sailing",
+    "Equestrian",
+    "Gymnastics",
+    "Weightlifting",
+    "Triathlon",
+    "Pentathlon",
+    "Golf",
+    "Baseball",
+    "Softball",
+    "Cricket",
+    "Hockey",
+    "Table Tennis",
+    "Squash",
+    "Surfing",
+    "Skateboarding",
+    "Climbing",
+    "BMX",
+    "Mountain Biking",
+    "Snowboarding",
+    "Skiing",
+    "Ice Hockey",
+    "Figure Skating",
+    "Speed Skating",
+    "Curling",
+    "Luge",
+    "Bobsleigh",
+    "Skeleton"
+];

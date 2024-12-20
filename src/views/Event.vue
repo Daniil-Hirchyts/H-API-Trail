@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {useRoute, useRouter} from 'vue-router';
@@ -36,11 +36,15 @@ onMounted(async () => {
       <CardDescription>{{ dayjs(event.start_at).format('DD/MM/YYYY HH:mm') }} au
         {{ dayjs(event.end_at).format('DD/MM/YYYY HH:mm') }}
       </CardDescription>
-      <div class="flex items-center gap-1 pt-1">
-        <Badge variant="secondary">{{ event.localisation }}</Badge>
-        <Badge variant="secondary">{{ event.sport }}</Badge>
-        <Badge variant="secondary">{{ event.max_participants }} participants</Badge>
-        <Badge variant="secondary">{{ event.price }}€</Badge>
+      <div class="gap-1 flex flex-row items-start justify-between">
+        <div class="grid gap-1">
+          <Badge variant="secondary">{{ event.localisation }}</Badge>
+          <Badge variant="secondary">{{ event.max_participants }} participants</Badge>
+          <Badge variant="secondary">{{ event.price }}€</Badge>
+        </div>
+        <div class="grid gap-2 grid-cols-2">
+          <Badge v-for="sport in event.sport" :key="sport" variant="secondary">{{ sport }}</Badge>
+        </div>
       </div>
       <Button @click="EventService.participate(event.id)" class="absolute top-6 right-6">
         Participate
