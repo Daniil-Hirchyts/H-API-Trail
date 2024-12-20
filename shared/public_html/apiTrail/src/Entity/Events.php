@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\EventsRepository;
 use App\State\EventsProcessor;
+use App\State\GetInfoParticipationProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -43,6 +44,7 @@ use Symfony\Flex\Unpack\Operation;
                 )
             ],
             description: "Récupère un event",
+            processor: GetInfoParticipationProcessor::class,
         ),
         new Post(
             description: "Crée un event",
