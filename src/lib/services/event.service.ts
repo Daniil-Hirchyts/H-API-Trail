@@ -18,6 +18,7 @@ export type ApiSportType = {
 	end_at: string,
 	sport: string[],
 	participants_visible: boolean,
+	participating: boolean,
 	participations: {
 		user: {
 			'id': number,
@@ -43,6 +44,7 @@ export type SportType = {
 	end_at: Date,
 	sport: string[],
 	participants_visible: boolean,
+	participating: boolean,
 	participations: {
 		user: {
 			'id': number,
@@ -70,7 +72,8 @@ export class EventService {
 			end_at: new Date(data.end_at),
 			sport: data.sport,
 			participations: data.participations,
-			participants_visible: data.participants_visible
+			participants_visible: data.participants_visible,
+			participating: data.participating ?? false
 		};
 	}
 
@@ -105,7 +108,7 @@ export class EventService {
 	static async participate(id: number) {
 		if (!userStore.isLoggedIn()) {
 			toast.error('Vous devez être connecté pour participer à un événement');
-			return;
+			return false;
 		}
 		const {success} = await post('participations', {
 			event: `/apiTrail/public/api/events/${id}`
@@ -115,5 +118,6 @@ export class EventService {
 		} else {
 			toast.success('Inscription réussie');
 		}
+		return success;
 	}
 }

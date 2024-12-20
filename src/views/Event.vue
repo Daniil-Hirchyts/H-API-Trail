@@ -3,16 +3,18 @@ import dayjs from 'dayjs';
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {useRoute, useRouter} from 'vue-router';
-import {computed, onMounted} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {eventStore} from '@/stores/event.store';
 import {Loader} from '@/components/ui/loader';
 import {Calendar, DollarSign, MapPin, Users} from 'lucide-vue-next';
+import {EventService} from '@/lib/services/event.service.ts';
 
 const route = useRoute();
 const router = useRouter();
 
 const event = computed(() => eventStore.events.find(e => e.id.toString() === route.params.id.toString()));
 const loading = computed(() => eventStore.loading);
+const loadingParticipate = ref(false);
 
 onMounted(async () => {
   if (!event.value) {
@@ -22,6 +24,16 @@ onMounted(async () => {
     }
   }
 });
+
+async function participate() {
+  if (!event.value) return;
+  loadingParticipate.value = true;
+  const success = await EventService.participate(event.value.id);
+  if (success) {
+    eventStore.participate(event.value.id);
+  }
+  loadingParticipate.value = false;
+}
 </script>
 
 <template>
@@ -54,7 +66,8 @@ onMounted(async () => {
             </Badge>
           </div>
           <div class="w-full max-w-4xl flex justify-end mt-6">
-            <Button variant="outline" class="text-black">
+            <Button variant="outline" class="text-black" @click="participate" :loading="loadingParticipate"
+                    :disabled="event.participating">
               Participate
             </Button>
           </div>
