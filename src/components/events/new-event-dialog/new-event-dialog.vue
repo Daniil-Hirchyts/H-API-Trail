@@ -6,18 +6,31 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {DatePicker} from '@/components/ui/date-picker';
 import {Checkbox} from "@/components/ui/checkbox";
-import {ref} from "vue";
-import {post} from '@/lib/api.ts';
+import {Popover, PopoverTrigger, PopoverContent} from '@/components/ui/popover';
+import {Command, CommandList, CommandInput, CommandItem, CommandGroup, CommandEmpty} from '@/components/ui/command';
+import {ref, computed} from "vue";
 import {toast} from 'vue-sonner';
-import {eventStore} from '@/stores/event.store.ts';
-import {ApiSportType, EventService} from '@/lib/services/event.service.ts';
+import {eventStore, sports} from '@/stores/event.store.ts';
 
 const dateRange = ref({
   start: null,
   end: null,
 });
-
 const openDialog = ref(false);
+const selectedSports = ref<string[]>([]);
+const searchQuery = ref('');
+
+const filteredSports = computed(() =>
+    sports.filter(sport => sport.toLowerCase().includes(searchQuery.value.toLowerCase()))
+);
+
+const toggleSportSelection = (sport: string) => {
+  if (selectedSports.value.includes(sport)) {
+    selectedSports.value = selectedSports.value.filter(s => s !== sport);
+  } else {
+    selectedSports.value.push(sport);
+  }
+};
 
 async function handleSubmit(e: Event) {
   e.preventDefault();
@@ -25,56 +38,47 @@ async function handleSubmit(e: Event) {
   const formEntries = Object.fromEntries(form.entries());
 
   if (!formEntries['start']) {
-    console.error('No date range data found.');
     toast.error('Veuillez sélectionner une plage de dates.');
     return;
   }
 
-  try {
-    const value = JSON.parse(formEntries['start'] as string);
+  const value = JSON.parse(formEntries['start'] as string);
 
-    if (!value.start || !value.end) {
-      console.error('Please select a valid date range before submitting.');
-      toast.error('Veuillez sélectionner une plage de dates valide.');
-      return;
-    }
+  if (!value.start || !value.end) {
+    toast.error('Veuillez sélectionner une plage de dates valide.');
+    return;
+  }
 
-    const formattedData: any = {
-      name: formEntries['name'],
-      localisation: formEntries['localisation'],
-      description: formEntries['description'],
-      start_at: new Date(value.start).toISOString(),
-      end_at: new Date(value.end).toISOString(),
-      price: parseFloat(formEntries['price'] as string) || 0,
-      max_participants: parseInt(formEntries['maxParticipants'] as string, 10) || 0,
-      participants_visible: formEntries['showParticipants'] === 'true',
-      sport: ["tennis"]
-    };
+  if (selectedSports.value.length === 0) {
+    toast.error('Veuillez sélectionner au moins un sport.');
+    return;
+  }
 
-    const {success, data} = await post('events', formattedData);
+  const eventData = {
+    name: formEntries['name'] as string,
+    localisation: formEntries['localisation'] as string,
+    description: formEntries['description'] as string,
+    start_at: new Date(value.start).toISOString(),
+    end_at: new Date(value.end).toISOString(),
+    price: parseFloat(formEntries['price'] as string) || 0,
+    max_participants: parseInt(formEntries['maxParticipants'] as string, 10) || 0,
+    participants_visible: formEntries['showParticipants'] === 'true',
+    sport: selectedSports.value,
+  };
 
-    if (success && data) {
-      toast.success('Événement créé avec succès!');
-      const newEvent = EventService['parseSport'](data as ApiSportType);
-      eventStore.addEvent(newEvent);
-      openDialog.value = false;
-    } else {
-      toast.error('Erreur lors de la création de l\'événement');
-      console.error('Error creating event:', data);
-    }
-  } catch (error) {
-    console.error('Invalid date range format:', error);
-    toast.error('Format de date invalide.');
+  const newEvent = await eventStore.createEvent(eventData);
+
+  if (newEvent) {
+    openDialog.value = false;
   }
 }
 </script>
 
+
 <template>
   <Dialog v-model:open="openDialog">
     <DialogTrigger as-child>
-      <Button variant="outline">
-        Créer un événement
-      </Button>
+      <Button variant="outline">Créer un événement</Button>
     </DialogTrigger>
     <DialogContent class="sm:max-w-[425px] overflow-y-auto max-h-[90vh]">
       <DialogHeader>
@@ -100,6 +104,38 @@ async function handleSubmit(e: Event) {
           <Label for="start">Dates</Label>
           <DatePicker id="start" name="start" v-model="dateRange"/>
           <input type="hidden" name="start" :value="JSON.stringify(dateRange)"/>
+        </div>
+        <div class="grid gap-2">
+          <Label for="sport">Sports</Label>
+          <Popover>
+            <PopoverTrigger as-child>
+              <Button variant="outline" class="w-full justify-between">
+                {{ selectedSports.length > 0 ? selectedSports.join(', ') : 'Select Sports' }}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent class="w-[200px]">
+              <Command>
+                <CommandInput
+                    placeholder="Rechercher un sport..."
+                    v-model="searchQuery"
+                />
+                <CommandEmpty>Aucun sport trouvé.</CommandEmpty>
+                <CommandList>
+                  <CommandGroup>
+                    <CommandItem
+                        v-for="sport in filteredSports"
+                        :key="sport"
+                        @select="toggleSportSelection(sport)"
+                        :value="sport"
+                    >
+                      <Checkbox :checked="selectedSports.includes(sport)" class="mr-2"/>
+                      {{ sport }}
+                    </CommandItem>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
         <div class="grid gap-2">
           <Label for="price">Prix</Label>

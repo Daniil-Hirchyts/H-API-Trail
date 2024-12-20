@@ -8,9 +8,7 @@ import {Loader} from "@/components/ui/loader";
 const isLoading = ref(true);
 
 watchEffect(() => {
-  if (userStore.initialized) {
-    isLoading.value = false;
-  }
+  if (userStore.initialized) isLoading.value = false;
 });
 
 </script>

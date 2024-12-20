@@ -24,11 +24,15 @@ defineProps({
       <CardContent>
         <p>{{ event.description }}</p>
       </CardContent>
-      <CardFooter class="gap-1">
+      <CardFooter class="gap-1 flex flex-row items-start justify-between">
+        <div class="grid gap-1">
         <Badge variant="secondary">{{ event.localisation }}</Badge>
-        <Badge variant="secondary">{{ event.sport }}</Badge>
         <Badge variant="secondary">{{ event.max_participants }} participants</Badge>
         <Badge variant="secondary">{{ event.price }}€</Badge>
+        </div>
+        <div class="grid gap-2 grid-cols-2">
+        <Badge v-for="sport in event.sport" :key="sport" variant="secondary">{{ sport }}</Badge>
+        </div>
       </CardFooter>
     </Card>
   </router-link>
