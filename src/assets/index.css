@@ -58,4 +58,6 @@
         @apply bg-background text-foreground;
         overscroll-behavior-y: none;
     }
+
+
 }
