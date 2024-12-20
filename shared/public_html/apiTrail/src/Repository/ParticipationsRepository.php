@@ -27,6 +27,7 @@ class ParticipationsRepository extends ServiceEntityRepository
         $count = $qb->getQuery()->getSingleScalarResult();
         return $count > 0;
     }
+
     public function getParticipationById($participationId)
     {
         $qb = $this->createQueryBuilder('p');
