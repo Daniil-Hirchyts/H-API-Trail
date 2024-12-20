@@ -23,11 +23,11 @@ const initialized = computed(() => userStore.initialized);
 
 <template>
   <header
-      class="absolute top-0 flex h-16 z-50 items-center justify-between gap-4 border-b bg-background/30 backdrop-blur-lg px-4 md:px-6 w-full"
+      class="sticky top-0 flex h-16 z-50 items-center justify-between gap-4 border-b bg-white px-4 md:px-6 w-full"
   >
     <nav class="font-medium flex items-center gap-5 text-sm lg:gap-6">
       <router-link
-          to="/public"
+          to="/"
           class="flex items-center gap-2 text-lg font-semibold md:text-base"
       >
         <Medal class="h-6 w-6"/>
@@ -59,7 +59,7 @@ const initialized = computed(() => userStore.initialized);
             <DropdownMenuLabel>{{ userStore.user?.login }}</DropdownMenuLabel>
             <DropdownMenuSeparator/>
             <router-link to="/profile">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem class="cursor-pointer">Profile</DropdownMenuItem>
             </router-link>
             <DropdownMenuSeparator/>
             <DropdownMenuItem class="p-0">

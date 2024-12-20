@@ -32,7 +32,7 @@ export const userStore = reactive<State & Actions>({
 
 	async login(username: string, password: string) {
 		this.loading = true;
-		const success = await AuthService.login(username, password);
+		const success: boolean = await AuthService.login(username, password);
 		this.loading = false;
 		return success;
 	},
@@ -44,7 +44,6 @@ export const userStore = reactive<State & Actions>({
 		return success;
 	},
 
-
 	async logout() {
 		this.loading = true;
 		await AuthService.logout();
@@ -54,7 +53,7 @@ export const userStore = reactive<State & Actions>({
 
 	async initializeUser() {
 		this.loading = true;
-		const success = await AuthService.refreshToken();
+		const success: boolean = await AuthService.refreshToken();
 		if (!success) {
 			this.user = undefined;
 		}

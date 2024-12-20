@@ -9,7 +9,7 @@ userStore.initializeUser();
 
 <template>
   <TooltipProvider>
-    <div id="app" class="relative h-screen">
+    <div id="app" class="relative min-h-screen">
       <router-view class="motion-opacity-in-[0%] motion-blur-in-[5px]"/>
     </div>
     <Toaster position="bottom-right"/>

@@ -3,9 +3,9 @@ import {NavigationBar} from "@/components/navigation/navigation-bar";
 </script>
 
 <template>
-  <div class="h-full flex flex-col items-center justify-between relative w-full">
+  <div class=" flex flex-col items-center justify-between w-full ">
     <NavigationBar/>
-    <main class="p-6 pt-20 w-full">
+    <main class="p-6 w-full">
       <router-view/>
     </main>
     <footer class="border-t w-full flex items-center justify-center py-4 ">
