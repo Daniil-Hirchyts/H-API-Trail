@@ -17,6 +17,7 @@ export type ApiSportType = {
 	start_at: string,
 	end_at: string,
 	sport: string[],
+	participants_visible: boolean,
 	participations: {
 		user: {
 			'id': number,
@@ -41,6 +42,7 @@ export type SportType = {
 	start_at: Date,
 	end_at: Date,
 	sport: string[],
+	participants_visible: boolean,
 	participations: {
 		user: {
 			'id': number,
@@ -67,7 +69,8 @@ export class EventService {
 			start_at: new Date(data.start_at),
 			end_at: new Date(data.end_at),
 			sport: data.sport,
-			participations: data.participations
+			participations: data.participations,
+			participants_visible: data.participants_visible
 		};
 	}
 
