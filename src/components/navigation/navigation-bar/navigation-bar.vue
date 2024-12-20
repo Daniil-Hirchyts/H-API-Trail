@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import {Medal} from 'lucide-vue-next';
+import {CircleUser, Medal} from 'lucide-vue-next';
 import {Button} from '@/components/ui/button';
 import {userStore} from '@/stores/user.store.ts';
-import {LogoutButton} from "@/components/navigation/logout-button";
-import {computed} from "vue";
-import {Loader} from "@/components/ui/loader";
-import {NewEventDialog} from "@/components/events/new-event-dialog";
+import {LogoutButton} from '@/components/navigation/logout-button';
+import {computed} from 'vue';
+import {Loader} from '@/components/ui/loader';
+import {NewEventDialog} from '@/components/events/new-event-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +13,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {CircleUser} from 'lucide-vue-next'
+} from '@/components/ui/dropdown-menu';
 
 const loading = computed(() => userStore.loading);
 const initialized = computed(() => userStore.initialized);
-const isOrga = computed(() => userStore.hasRole(["ROLE_ORGA"]));
+const isOrga = computed(() => userStore.hasRole(['ROLE_ORGA']));
 
 </script>
 
@@ -33,6 +32,18 @@ const isOrga = computed(() => userStore.hasRole(["ROLE_ORGA"]));
       >
         <Medal class="h-6 w-6"/>
         <span class="sr-only">Hapi Trail</span>
+      </router-link>
+      <router-link
+          to="/"
+          class="flex items-center gap-2 text-muted-foreground [&.router-link-exact-active]:text-foreground md:text-base"
+      >
+        <span>Événements</span>
+      </router-link>
+      <router-link
+          to="/participations"
+          class="flex items-center gap-2 text-muted-foreground [&.router-link-exact-active]:text-foreground md:text-base"
+      >
+        <span>Participations</span>
       </router-link>
     </nav>
     <div class="flex gap-4 items-center">
