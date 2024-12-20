@@ -5,7 +5,7 @@ import {NavigationBar} from "@/components/navigation/navigation-bar";
 <template>
   <div class=" flex flex-col items-center justify-between w-full ">
     <NavigationBar/>
-    <main class="p-6 w-full">
+    <main class="p-6 w-full h-[calc(100dvh-121px)]">
       <router-view/>
     </main>
     <footer class="border-t w-full flex items-center justify-center py-4 ">

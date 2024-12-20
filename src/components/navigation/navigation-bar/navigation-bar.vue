@@ -18,6 +18,7 @@ import {CircleUser} from 'lucide-vue-next'
 
 const loading = computed(() => userStore.loading);
 const initialized = computed(() => userStore.initialized);
+const isOrga = computed(() => userStore.hasRole(["ROLE_ORGA"]));
 
 </script>
 
@@ -47,7 +48,7 @@ const initialized = computed(() => userStore.initialized);
         </router-link>
       </template>
       <template v-else>
-        <NewEventDialog/>
+        <NewEventDialog v-if="isOrga"/>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
             <Button variant="secondary" size="icon" class="rounded-full border border-input bg-transparent">

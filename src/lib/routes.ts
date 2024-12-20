@@ -1,5 +1,4 @@
-// src/router/index.js
-import {createRouter, createWebHistory} from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '@/views/Home.vue';
 import LoginPage from '@/views/Login.vue';
 import RegisterPage from '@/views/Register.vue';
@@ -9,6 +8,7 @@ import EventPage from '@/views/Event.vue';
 import NotFoundPage from '@/views/NotFound.vue';
 import MainLayout from '@/layouts/Main-Layout.vue';
 import AuthLayout from '@/layouts/Auth-Layout.vue';
+import { userStore } from '@/stores/user.store';
 
 const routes = [
 	{
@@ -18,25 +18,29 @@ const routes = [
 			{
 				path: '',
 				name: 'Home',
-				component: HomePage
+				component: HomePage,
+				meta: { requiresAuth: false },
 			},
 			{
 				path: 'races',
 				name: 'Races',
-				component: RacesPage
+				component: RacesPage,
+				meta: { requiresAuth: true },
 			},
 			{
 				path: 'profile',
 				name: 'Profile',
-				component: ProfilePage
+				component: ProfilePage,
+				meta: { requiresAuth: true },
 			},
 			{
 				path: 'event/:id',
 				name: 'Event',
-				component: EventPage
+				component: EventPage,
+				meta: { requiresAuth: false },
+				// meta: { requiresAuth: true, roles: ["ROLE_ORGA"] },
 			},
-
-		]
+		],
 	},
 	{
 		path: '/',
@@ -45,26 +49,50 @@ const routes = [
 			{
 				path: 'login',
 				name: 'Login',
-				component: LoginPage
+				component: LoginPage,
+				meta: { requiresAuth: false },
 			},
 			{
 				path: 'register',
 				name: 'Register',
-				component: RegisterPage
-			}]
+				component: RegisterPage,
+				meta: { requiresAuth: false },
+			},
+		],
 	},
-	// 404
 	{
 		path: '/:pathMatch(.*)*',
 		name: 'NotFound',
-		component: NotFoundPage
-	}
+		component: NotFoundPage,
+		meta: { requiresAuth: false },
+	},
 ];
 
-// Création du routeur
 const router = createRouter({
-	history: createWebHistory(), // Utilise l'historique HTML5
-	routes // Ajout des routes
+	history: createWebHistory(),
+	routes,
 });
+
+router.beforeEach(async (to, _from, next) => {
+	if (!userStore.initialized) {
+		await userStore.initializeUser();
+	}
+
+	const user = userStore.user;
+	const isAuthenticated = !!user;
+	const userRoles = user?.roles || [];
+
+	if (to.meta.requiresAuth && !isAuthenticated) {
+		return next({ name: 'Login' });
+	}
+
+	if (Array.isArray(to.meta.roles)) {
+		const hasRole = to.meta.roles.some((role: string) => userRoles.includes(role));
+		if (!hasRole) return next({ name: 'Home' });
+	}
+
+	next();
+});
+
 
 export default router;
