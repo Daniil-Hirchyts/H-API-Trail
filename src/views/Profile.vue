@@ -1,34 +1,49 @@
 <script setup lang="ts">
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
-import {Label} from '@/components/ui/label';
-import {Button} from '@/components/ui/button';
-import {ref, computed} from 'vue';
-import {userStore} from '@/stores/user.store';
-import {Eye, EyeOff} from "lucide-vue-next";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { ref, computed, onMounted } from 'vue';
+import {PasswordInput} from '@/components/ui/input';
+import { userStore } from '@/stores/user.store';
 
 const email = ref('');
 const password = ref('');
-const isPasswordVisible = ref(false);
+const nom = ref('');
+const prenom = ref('');
+const telephone = ref('');
 
-const updatedData = computed(() => {
-  const data: { login?: string; email?: string; plainPassword?: string } = {};
-  if (email.value.trim()) data.email = email.value.trim();
-  if (password.value.trim()) data.plainPassword = password.value.trim();
-  return data;
+onMounted(() => {
+  const user = userStore.getUser();
+  if (user) {
+    email.value = user.email || '';
+    nom.value = user.nom || '';
+    prenom.value = user.prenom || '';
+    telephone.value = user.telephone || '';
+  }
 });
 
-const togglePasswordVisibility = () => {
-  isPasswordVisible.value = !isPasswordVisible.value;
-};
+const updatedData = computed(() => {
+  const data: {
+    login?: string;
+    email?: string;
+    plainPassword?: string;
+    nom?: string;
+    prenom?: string;
+    telephone?: string;
+  } = {};
+  if (email.value.trim()) data.email = email.value.trim();
+  if (password.value.trim()) data.plainPassword = password.value.trim();
+  if (nom.value.trim()) data.nom = nom.value.trim();
+  if (prenom.value.trim()) data.prenom = prenom.value.trim();
+  if (telephone.value.trim()) data.telephone = telephone.value.trim();
+  return data;
+});
 
 async function handleUpdate(e: Event) {
   e.preventDefault();
   const success = await userStore.updateProfile(updatedData.value);
-  if (success) {
-    email.value = '';
-    password.value = '';
-  }
+  if (success) password.value = '';
 }
 
 async function handleDelete() {
@@ -48,28 +63,23 @@ async function handleDelete() {
         <form @submit="handleUpdate" class="grid grid-cols-2 gap-4">
           <div class="grid gap-2">
             <Label for="email">Email</Label>
-            <Input id="email" name="email" type="email" v-model="email" placeholder="Leave blank to keep current email"/>
+            <Input id="email" name="email" type="email" v-model="email" placeholder="Leave blank to keep current email" />
           </div>
           <div class="grid gap-2 relative">
             <Label for="password">Password</Label>
-            <div class="relative h-fit">
-              <Input
-                  id="password"
-                  name="password"
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  placeholder="Leave blank to keep current password"
-                  v-model="password"
-              />
-              <button
-                  type="button"
-                  class="absolute right-2 top-1/2 flex items-center justify-center  text-muted-foreground/80 hover:text-foreground -translate-y-1/2"
-                  @click="togglePasswordVisibility"
-                  :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
-                  :aria-pressed="isPasswordVisible.toString()"
-              >
-                <component :is="isPasswordVisible ? EyeOff : Eye" class="w-5 h-5" aria-hidden="true"/>
-              </button>
-            </div>
+            <PasswordInput v-model="password" placeholder="Leave blank to keep current password" />
+          </div>
+          <div class="grid gap-2">
+            <Label for="nom">Nom</Label>
+            <Input id="nom" name="nom" type="text" v-model="nom" placeholder="Enter your last name" />
+          </div>
+          <div class="grid gap-2">
+            <Label for="prenom">Prenom</Label>
+            <Input id="prenom" name="prenom" type="text" v-model="prenom" placeholder="Enter your first name" />
+          </div>
+          <div class="grid gap-2">
+            <Label for="telephone">Telephone</Label>
+            <Input id="telephone" name="telephone" type="tel" v-model="telephone" placeholder="Enter your phone number" />
           </div>
           <Button type="submit" :loading="userStore.saving" class="w-full col-span-2">Update Profile</Button>
         </form>

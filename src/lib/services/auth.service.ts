@@ -1,34 +1,23 @@
+// src/lib/services/auth.service.ts
 import {post} from '@/lib/api.ts';
 import {toast} from 'vue-sonner';
-import {userStore} from '@/stores/user.store.ts';
+import {userStore, User} from '@/stores/user.store.ts';
 import router from "@/lib/routes.ts";
 
 export class AuthService {
     static async login(login: string, password: string) {
-        const {success, data} = await post<{
-            data: {
-                id: number,
-                login: string,
-                roles: string[],
-                email: string
-            }
-        }>('auth/login', {login, password});
+        const {success, data} = await post<{ data: User }>('auth/login', {login, password});
         if (!success) {
             toast.error('Nom d\'utilisateur ou mot de passe incorrect');
         } else {
-            userStore.user = {
-                id: data!.data.id,
-                login: data!.data.login,
-                email: data!.data.email,
-                roles: data!.data.roles
-            };
+            userStore.user = data!.data;
             toast.success('Connexion réussie');
         }
         return success;
     }
 
     static async register(login: string, email: string, password: string, roles: string[]) {
-        const {success, data} = await post<any>('auth/register', {
+        const {success, data} = await post<{ data: User }>('auth/register', {
             login,
             plainPassword: password,
             email,
@@ -39,23 +28,10 @@ export class AuthService {
         return {success, data};
     }
 
-
     static async refreshToken() {
-        const {success, data} = await post<{
-            data: {
-                id: number,
-                login: string,
-                email: string,
-                roles: string[]
-            }
-        }>('token/refresh');
+        const {success, data} = await post<{ data: User }>('token/refresh');
         if (success) {
-            userStore.user = {
-                id: data!.data.id,
-                login: data!.data.login,
-                email: data!.data.email,
-                roles: data!.data.roles
-            };
+            userStore.user = data!.data;
         }
         return success;
     }

@@ -11,12 +11,15 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {InfoIcon} from 'lucide-vue-next';
 import {userStore} from "@/stores/user.store.ts";
 import {Checkbox} from "@/components/ui/checkbox";
+import {PasswordInput} from '@/components/ui/input';
 
 const annuaireLoading = ref(false);
 const code = ref('');
 const router = useRouter();
 const username = ref('');
 const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
 const saving = ref(false);
 
 async function getUserData() {
@@ -33,24 +36,24 @@ async function getUserData() {
 
 async function handleSubmit(e: Event) {
   e.preventDefault();
-  const form = new FormData(e.target as HTMLFormElement);
-  const formEntries = Object.fromEntries(form.entries());
-  if (formEntries['password'] !== formEntries['confirmPassword']) {
+  if (password.value !== confirmPassword.value) {
     toast.error('Passwords do not match');
     return;
   }
-  const roles = formEntries['roleOrga'] === 'true' ? ["ROLE_ORGA"] : [];
+  const form = new FormData(e.target as HTMLFormElement);
+  const roles = form.get('roleOrga') === 'true' ? ["ROLE_ORGA"] : [];
   saving.value = true;
   const success = await userStore.register(
-      formEntries['username'] as string,
-      formEntries['email'] as string,
-      formEntries['password'] as string,
+      username.value,
+      email.value,
+      password.value,
       roles
   );
   saving.value = false;
   if (success) await router.push('/login');
 }
 </script>
+
 
 <template>
   <div class="w-screen h-screen flex flex-col gap-4 items-center justify-center">
@@ -86,19 +89,19 @@ async function handleSubmit(e: Event) {
         <form @submit="handleSubmit" class="grid gap-4">
           <div class="grid gap-2">
             <Label for="username">Username</Label>
-            <Input id="username" name="username" required/>
+            <Input id="username" name="username" v-model="username" required/>
           </div>
           <div class="grid gap-2">
             <Label for="email">Email</Label>
-            <Input id="email" name="email" type="email" required/>
+            <Input id="email" name="email" type="email" v-model="email" required/>
           </div>
           <div class="grid gap-2">
             <Label for="password">Password</Label>
-            <Input id="password" name="password" type="password" required/>
+            <PasswordInput id="password" name="password" v-model="password" required/>
           </div>
           <div class="grid gap-2">
             <Label for="confirmPassword">Confirm Password</Label>
-            <Input id="confirmPassword" name="confirmPassword" type="password" required/>
+            <PasswordInput id="confirmPassword" name="confirmPassword" v-model="confirmPassword" required/>
           </div>
           <div class="flex items-center space-x-2">
             <input type="hidden" name="roleOrga" value="false"/>

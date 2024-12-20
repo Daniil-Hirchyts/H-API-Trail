@@ -8,6 +8,9 @@ export type User = {
     login: string;
     email: string;
     roles: string[];
+    nom?: string;
+    prenom?: string;
+    telephone?: string;
 };
 
 type State = {
@@ -90,7 +93,14 @@ export const userStore = reactive<State & Actions>({
         return this.user;
     },
 
-    async updateProfile(data: { login?: string; email?: string; plainPassword?: string }) {
+    async updateProfile(data: {
+        login?: string;
+        email?: string;
+        plainPassword?: string;
+        nom?: string;
+        prenom?: string;
+        telephone?: string;
+    }) {
         if (!this.user) {
             toast.error('User is not logged in.');
             return false;
@@ -102,6 +112,9 @@ export const userStore = reactive<State & Actions>({
                 ...this.user,
                 login: data.login || this.user.login,
                 email: data.email || this.user.email,
+                nom: data.nom || this.user.nom,
+                prenom: data.prenom || this.user.prenom,
+                telephone: data.telephone || this.user.telephone,
             });
         }
         this.saving = false;

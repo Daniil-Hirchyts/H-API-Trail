@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
+import {Input, PasswordInput} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
@@ -41,9 +41,9 @@ async function handleSubmit(e: Event) {
             <Label for="username">Username</Label>
             <Input id="username" v-model="username" required/>
           </div>
-          <div class="grid gap-2">
+          <div class="grid gap-2 relative">
             <Label for="password">Password</Label>
-            <Input id="password" type="password" v-model="password" required/>
+            <PasswordInput id="password" type="password" v-model="password" required />
           </div>
           <Button type="submit" :loading="loading" class="w-full">
             Sign in

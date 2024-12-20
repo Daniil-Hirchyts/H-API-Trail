@@ -1,8 +1,9 @@
 import {patch, del} from '@/lib/api';
 import {toast} from 'vue-sonner';
+import {User} from '@/stores/user.store.ts';
 
 export class UserService {
-    static async updateProfile(userId: number, data: { login?: string; email?: string; plainPassword?: string }) {
+    static async updateProfile(userId: number, data: Partial<User>) {
         try {
             const {success} = await patch(`utilisateurs/${userId}`, data);
             if (success) {
