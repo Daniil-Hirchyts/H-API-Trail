@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\EventsRepository;
+use App\State\AddInfoToEvent;
 use App\State\EventsProcessor;
 use App\State\GetInfoParticipationProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -44,7 +45,9 @@ use Symfony\Flex\Unpack\Operation;
                 )
             ],
             description: "Récupère un event",
-            processor: GetInfoParticipationProcessor::class,
+            normalizationContext: ['groups' => ['event:details', 'event:read', 'participation:utilisateur:read']],
+            denormalizationContext: ['groups' => ['event:write']],
+            provider: AddInfoToEvent::class,
         ),
         new Post(
             description: "Crée un event",
@@ -131,9 +134,34 @@ class Events
     #[Groups(['event:read'])]
     private Collection $participations;
 
+    #[Groups(['event:details', 'event:write'])]
+    private bool $participating = false;
+
+    public function getValueOfChecker(): string
+    {
+        return $this->valueOfChecker;
+    }
+
+    public function setValueOfChecker(string $valueOfChecker): void
+    {
+        $this->valueOfChecker = $valueOfChecker;
+    }
+
+
+
     public function __construct()
     {
         $this->participations = new ArrayCollection();
+    }
+
+    public function isParticipating(): bool
+    {
+        return $this->participating;
+    }
+
+    public function setParticipating(bool $participating): void
+    {
+        $this->participating = $participating;
     }
 
     public function getId(): ?int

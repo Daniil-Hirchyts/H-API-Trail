@@ -31,3 +31,4 @@ services:
   App\Security\Voter\RoleVoter:
     tags:
       - { name: security.voter }
+
