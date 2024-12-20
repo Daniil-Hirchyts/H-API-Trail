@@ -42,7 +42,7 @@ async function toggleParticipation() {
         (p) => p.user.id === userStore.getUser()?.id
     );
     if (participation) {
-      const success = await EventService.deleteParticipation(event.value.id);
+      const success = await EventService.deleteParticipation(participation.id);
       if (success) {
         eventStore.removeParticipation(event.value.id);
       }

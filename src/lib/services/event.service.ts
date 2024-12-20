@@ -121,7 +121,7 @@ export class EventService {
         return success;
     }
 
-    static async deleteParticipation(eventId: number) {
+    static async deleteParticipation(participationId: number) {
         if (!userStore.isLoggedIn()) {
             toast.error('Vous devez être connecté pour annuler votre participation');
             return false;
@@ -132,7 +132,7 @@ export class EventService {
             return false;
         }
 
-        const {success} = await del(`utilisateurs/${userId}/events/${eventId}`);
+        const {success} = await del(`participations/${participationId}`);
         if (!success) {
             toast.error("Erreur lors de l'annulation de la participation");
         } else {
