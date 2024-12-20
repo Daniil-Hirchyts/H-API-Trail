@@ -30,7 +30,8 @@ const isOrga = computed(() => userStore.hasRole(['ROLE_ORGA']));
           to="/"
           class="flex items-center gap-2 text-lg font-semibold md:text-base"
       >
-        <Medal class="h-6 w-6 drop-shadow motion-translate-x-in-[0%] motion-translate-y-in-[-25%] motion-opacity-in-[0%] motion-duration-[300ms]/translate motion-duration-[300ms]/opacity motion-ease-bounce"/>
+        <Medal
+            class="h-6 w-6 drop-shadow motion-translate-x-in-[0%] motion-translate-y-in-[-25%] motion-opacity-in-[0%] motion-duration-[500ms]/translate motion-duration-[500ms]/opacity motion-ease-bounce"/>
         <span class="sr-only">Hapi Trail</span>
       </router-link>
       <router-link
