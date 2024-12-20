@@ -22,21 +22,27 @@ class DeleteParticipationProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         //verifi si l'utilisateur est l'owner de la participation si lutilisateur n'est pas admin
-        $userIdProvided = $uriVariables['idUser'];
-        $participationId = $uriVariables['idParticipation'];
+        $userIdProvided = $uriVariables['idUser'] ?? null;
+        $idEvent = $uriVariables['idEvent'] ?? null;
+        if (!$userIdProvided || !$idEvent) {
+            throw new \Exception('User not found or not authorized.');
+        } else {
+            $participation = $this->participationsRepository->getParticipationByData($userIdProvided, $idEvent);
+        }
+
         $actualUser = $this->security->getUser();
 
         if (!$this->security->isGranted('ROLE_ADMIN') && $actualUser->getId() !== $userIdProvided) {
             throw new \Exception('User not found or not authorized.');
         }
 
-        $userIdOfParticipation = $this->participationsRepository->getParticipationById($participationId)->getUser()->getId();
+        $userIdOfParticipation = $participation->getUser()->getId();
 
         if (!$this->security->isGranted('ROLE_ADMIN') && $actualUser->getId() !== $userIdOfParticipation) {
             throw new \Exception('User not authorized.');
         }
 
-        $this->participationsRepository->deleteParticipation($participationId);
+        $this->participationsRepository->deleteParticipation($participation);
 
         return $this->persistProcessor->process($data, $operation, $uriVariables, $context);
     }

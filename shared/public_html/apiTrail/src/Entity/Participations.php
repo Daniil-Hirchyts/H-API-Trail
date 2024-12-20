@@ -22,6 +22,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use function MongoDB\BSON\toJSON;
 
 
 #[ApiResource(
@@ -74,7 +75,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
     validationContext: ["groups" => ["Default", 'participation:utilisateur:event:write']],
 )]
 #[ApiResource(
-    uriTemplate: '/utilisateurs/{idUser}/participations/{idParticipation}',
+    uriTemplate: '/utilisateurs/{idUser}/events/{idEvent}',
     operations: [
         new Delete(
             description: "Supprimer une participation",
@@ -87,8 +88,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
             toProperty: 'user',
             fromClass: Utilisateurs::class,
         ),
-        'idParticipation' => new Link(
-            fromClass: Participations::class,
+        'idEvent' => new Link(
+            toProperty: 'event',
+            fromClass: Events::class,
         )
     ],
     normalizationContext: ["groups" => ['participation:event:read']],

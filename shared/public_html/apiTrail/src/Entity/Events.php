@@ -147,8 +147,6 @@ class Events
         $this->valueOfChecker = $valueOfChecker;
     }
 
-
-
     public function __construct()
     {
         $this->participations = new ArrayCollection();
