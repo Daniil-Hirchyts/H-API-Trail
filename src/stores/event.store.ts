@@ -1,6 +1,6 @@
-import {reactive} from 'vue';
-import {EventService, SportType} from '@/lib/services/event.service';
-import {userStore} from '@/stores/user.store.ts';
+import { reactive } from 'vue';
+import { EventService, SportType } from '@/lib/services/event.service';
+import { userStore } from '@/stores/user.store.ts';
 
 type State = {
 	events: SportType[];
@@ -12,8 +12,8 @@ type Actions = {
 	addEvent: (event: SportType) => void;
 	loadEvents: () => Promise<void>;
 	getEventById: (id: string) => Promise<SportType | null>;
-	createEvent: (eventData: Partial<SportType>) => Promise<SportType | null>;
 	participate: (id: number) => void;
+	removeParticipation: (id: number) => void;
 };
 
 export const eventStore = reactive<State & Actions>({
@@ -39,7 +39,7 @@ export const eventStore = reactive<State & Actions>({
 
 	async getEventById(id: string): Promise<SportType | null> {
 		this.loading = true;
-		const existingEvent = this.events.find(event => event.id.toString() === id);
+		const existingEvent = this.events.find((event) => event.id.toString() === id);
 		if (existingEvent) {
 			this.loading = false;
 			return existingEvent;
@@ -53,28 +53,35 @@ export const eventStore = reactive<State & Actions>({
 		return event;
 	},
 
-	async createEvent(eventData: Partial<SportType>): Promise<SportType | null> {
-		const newEvent = await EventService.create(eventData);
-		if (newEvent) {
-			this.addEvent(newEvent);
-			return newEvent;
-		}
-		return null;
-	},
 	participate(id: number) {
-		this.events = this.events.map(event => {
+		this.events = this.events.map((event) => {
 			if (event.id === id) {
-				event.participating = !event.participating;
-				if (event.participants_visible && userStore.user) {
-					event.participations.push({
-						user: userStore.user
-					});
+				event.participating = true;
+				const user = userStore.getUser();
+				if (user && event.participants_visible) {
+					event.participations.push({ user });
 				}
 			}
 			return event;
 		});
-	}
+	},
+
+	removeParticipation(id: number) {
+		this.events = this.events.map((event) => {
+			if (event.id === id) {
+				event.participating = false;
+				const user = userStore.getUser();
+				if (user) {
+					event.participations = event.participations.filter(
+						(participation) => participation.user.id !== user.id
+					);
+				}
+			}
+			return event;
+		});
+	},
 });
+
 
 
 export const sports: string[] = [

@@ -13,12 +13,12 @@ import {userStore} from "@/stores/user.store.ts";
 const route = useRoute();
 const router = useRouter();
 
-const event = computed(() => eventStore.events.find(e => e.id.toString() === route.params.id.toString()))
+const event = computed(() => eventStore.events.find((e) => e.id.toString() === route.params.id.toString()));
 const loading = computed(() => eventStore.loading);
-const loadingParticipate = ref(false);
+const loadingAction = ref(false);
 
 const isParticipating = computed(() => {
-  return event?.value.participations.some(
+  return event.value?.participations.some(
       (participation) => participation.user.id === userStore.getUser()?.id
   );
 });
@@ -32,14 +32,28 @@ onMounted(async () => {
   }
 });
 
-async function participate() {
+async function toggleParticipation() {
   if (!event.value) return;
-  loadingParticipate.value = true;
-  const success = await EventService.participate(event.value.id);
-  if (success) {
-    eventStore.participate(event.value.id);
+  loadingAction.value = true;
+
+  if (isParticipating.value) {
+    const participation = event.value.participations.find(
+        (p) => p.user.id === userStore.getUser()?.id
+    );
+    if (participation) {
+      const success = await EventService.deleteParticipation(event.value.id);
+      if (success) {
+        eventStore.removeParticipation(event.value.id);
+      }
+    }
+  } else {
+    const success = await EventService.participate(event.value.id);
+    if (success) {
+      eventStore.participate(event.value.id);
+    }
   }
-  loadingParticipate.value = false;
+
+  loadingAction.value = false;
 }
 </script>
 
@@ -77,14 +91,8 @@ async function participate() {
             </Badge>
           </div>
           <div class="w-full max-w-4xl flex justify-end mt-6">
-
-            <Button variant="outline" class="text-black" @click="participate" :loading="loadingParticipate"
-                    :disabled="event.participating" v-if="!isParticipating">
-              Participer
-            </Button>
-            <Button variant="destructive" @click="participate" :loading="loadingParticipate"
-                    :disabled="event.participating" v-else>
-              Annuler participation
+            <Button variant="destructive" @click="toggleParticipation" :loading="loadingAction">
+              {{ isParticipating ? 'Annuler participation' : 'Participer' }}
             </Button>
           </div>
         </div>

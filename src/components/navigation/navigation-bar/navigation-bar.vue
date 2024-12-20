@@ -23,25 +23,26 @@ const isOrga = computed(() => userStore.hasRole(['ROLE_ORGA']));
 
 <template>
   <header
-      class="sticky top-0 flex h-16 z-50 items-center justify-between gap-4 border-b bg-white px-4 md:px-6 w-full"
+      class="sticky top-0 flex h-16 z-50 items-center justify-between gap-4 border-b bg-white px-4 md:px-6 w-full shadow-sm"
   >
     <nav class="font-medium flex items-center gap-5 text-sm lg:gap-6">
       <router-link
           to="/"
           class="flex items-center gap-2 text-lg font-semibold md:text-base"
       >
-        <Medal class="h-6 w-6"/>
+        <Medal class="h-6 w-6 drop-shadow motion-translate-x-in-[0%] motion-translate-y-in-[-25%] motion-opacity-in-[0%] motion-duration-[300ms]/translate motion-duration-[300ms]/opacity motion-ease-bounce"/>
         <span class="sr-only">Hapi Trail</span>
       </router-link>
       <router-link
           to="/"
           class="flex items-center gap-2 text-muted-foreground [&.router-link-exact-active]:text-foreground md:text-base"
       >
-        <span>Événements</span>
+        <span
+        >Événements</span>
       </router-link>
-      <router-link
-          to="/participations"
-          class="flex items-center gap-2 text-muted-foreground [&.router-link-exact-active]:text-foreground md:text-base"
+      <router-link v-if="userStore.isLoggedIn()"
+                   to="/participations"
+                   class="flex items-center gap-2 text-muted-foreground [&.router-link-exact-active]:text-foreground md:text-base"
       >
         <span>Participations</span>
       </router-link>
@@ -52,10 +53,11 @@ const isOrga = computed(() => userStore.hasRole(['ROLE_ORGA']));
       </template>
       <template v-else-if="!userStore.isLoggedIn()">
         <router-link to="/login">
-          <Button>Login</Button>
+          <Button class="h-full">Login</Button>
         </router-link>
+        <div class="w-[1px] h-6 bg-black rounded-full opacity-20"/>
         <router-link to="/register">
-          <Button>Register</Button>
+          <Button class="h-full">Register</Button>
         </router-link>
       </template>
       <template v-else>

@@ -1,4 +1,4 @@
-import {get, post} from '@/lib/api.ts';
+import {del, get, post} from '@/lib/api.ts';
 import {toast} from 'vue-sonner';
 import {userStore} from '@/stores/user.store.ts';
 
@@ -117,6 +117,26 @@ export class EventService {
 			toast.error('Erreur lors de l\'inscription à l\'événement');
 		} else {
 			toast.success('Inscription réussie');
+		}
+		return success;
+	}
+
+	static async deleteParticipation(eventId: number) {
+		if (!userStore.isLoggedIn()) {
+			toast.error('Vous devez être connecté pour annuler votre participation');
+			return false;
+		}
+		const userId = userStore.getUser()?.id;
+		if (!userId) {
+			toast.error("Erreur d'identification utilisateur");
+			return false;
+		}
+
+		const { success } = await del(`utilisateurs/${userId}/events/${eventId}`);
+		if (!success) {
+			toast.error("Erreur lors de l'annulation de la participation");
+		} else {
+			toast.success("Participation annulée avec succès");
 		}
 		return success;
 	}
