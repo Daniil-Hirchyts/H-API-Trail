@@ -1,4 +1,3 @@
-// src/lib/services/auth.service.ts
 import {post} from '@/lib/api.ts';
 import {toast} from 'vue-sonner';
 import {userStore, User} from '@/stores/user.store.ts';
@@ -30,9 +29,8 @@ export class AuthService {
 
     static async refreshToken() {
         const {success, data} = await post<{ data: User }>('token/refresh');
-        if (success) {
-            userStore.user = data!.data;
-        }
+        if (success) userStore.user = data!.data;
+
         return success;
     }
 

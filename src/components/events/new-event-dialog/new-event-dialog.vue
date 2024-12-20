@@ -87,25 +87,21 @@ async function handleSubmit(e: Event) {
           Créez un nouvel événement en remplissant les champs ci-dessous.
         </DialogDescription>
       </DialogHeader>
-      <form class="grid gap-4" @submit="handleSubmit">
-        <div class="grid gap-2">
+      <form class="grid gap-4 grid-cols-2" @submit="handleSubmit">
+        <div class="grid gap-2 col-span-2">
           <Label for="name">Nom</Label>
           <Input id="name" name="name"/>
         </div>
-        <div class="grid gap-2">
-          <Label for="localisation">Lieu</Label>
-          <Input id="localisation" name="localisation"/>
-        </div>
-        <div class="grid gap-2">
+        <div class="grid gap-2 col-span-2">
           <Label for="description">Description</Label>
           <Textarea id="description" name="description"/>
         </div>
-        <div class="grid gap-2">
+        <div class="grid gap-2 col-span-2">
           <Label for="start">Dates</Label>
           <DatePicker id="start" name="start" v-model="dateRange"/>
           <input type="hidden" name="start" :value="JSON.stringify(dateRange)"/>
         </div>
-        <div class="grid gap-2">
+        <div class="grid gap-2 col-span-2">
           <Label for="sport">Sports</Label>
           <Popover>
             <PopoverTrigger as-child>
@@ -137,20 +133,24 @@ async function handleSubmit(e: Event) {
             </PopoverContent>
           </Popover>
         </div>
+        <div class="grid gap-2 col-span-2">
+          <Label for="localisation">Lieu</Label>
+          <Input id="localisation" name="localisation"/>
+        </div>
         <div class="grid gap-2">
           <Label for="price">Prix</Label>
           <Input id="price" name="price" placeholder="0 €"/>
         </div>
         <div class="grid gap-2">
-          <Label for="maxParticipants">Nombre max de participants</Label>
+          <Label for="maxParticipants">Nb max de participants</Label>
           <Input id="maxParticipants" name="maxParticipants"/>
         </div>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 col-span-2">
           <input type="hidden" name="showParticipants" value="false"/>
           <Checkbox id="showParticipants" name="showParticipants" value="true"/>
           <Label for="showParticipants">Visibilité des participants</Label>
         </div>
-        <Button class="mt-4" type="submit" :disabled="!dateRange.start || !dateRange.end">
+        <Button class="mt-4 col-span-2" type="submit" :disabled="!dateRange.start || !dateRange.end">
           Ajouter
         </Button>
       </form>

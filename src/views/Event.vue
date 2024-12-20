@@ -8,13 +8,20 @@ import {eventStore} from '@/stores/event.store';
 import {Loader} from '@/components/ui/loader';
 import {Calendar, DollarSign, MapPin, Users} from 'lucide-vue-next';
 import {EventService} from '@/lib/services/event.service.ts';
+import {userStore} from "@/stores/user.store.ts";
 
 const route = useRoute();
 const router = useRouter();
 
-const event = computed(() => eventStore.events.find(e => e.id.toString() === route.params.id.toString()));
+const event = computed(() => eventStore.events.find(e => e.id.toString() === route.params.id.toString()))
 const loading = computed(() => eventStore.loading);
 const loadingParticipate = ref(false);
+
+const isParticipating = computed(() => {
+  return event?.value.participations.some(
+      (participation) => participation.user.id === userStore.getUser()?.id
+  );
+});
 
 onMounted(async () => {
   if (!event.value) {
@@ -44,7 +51,7 @@ async function participate() {
   <div v-else-if="event"
        class="flex flex-col items-center motion-translate-x-in-[0%] motion-translate-y-in-[10%] motion-opacity-in-[0%] motion-blur-in-[8px] motion-duration-[500ms]/opacity">
     <div
-        class="w-full max-w-4xl bg-gradient-to-r from-lime-300 via-lime-200 to-lime-100 rounded-lg shadow-lg p-6 text-white mb-6">
+        class="w-full max-w-4xl bg-gradient-to-r from-blue-300 via-blue-200 to-blue-100 rounded-lg shadow-lg p-6 text-white mb-6">
       <div class="flex justify-between items-start">
         <div>
           <h1 class="text-2xl font-bold capitalize text-black">{{ event.name }}</h1>
@@ -53,22 +60,31 @@ async function participate() {
             {{ dayjs(event.start_at).format('DD/MM/YYYY') }} au
             {{ dayjs(event.end_at).format('DD/MM/YYYY') }}
           </p>
+          <p v-if="isParticipating" class="py-1 text-sm font-medium mt-2 text-black">
+            Vous participez à cet événement
+          </p>
         </div>
+
         <div class="flex flex-col">
           <div class="flex flex-wrap justify-end gap-1">
             <Badge
                 v-for="sport in event.sport"
                 :key="sport"
                 variant="secondary"
-                class="bg-lime-600 text-white hover:bg-lime-700"
+                class="bg-blue-400 text-white hover:bg-blue-500"
             >
               {{ sport }}
             </Badge>
           </div>
           <div class="w-full max-w-4xl flex justify-end mt-6">
+
             <Button variant="outline" class="text-black" @click="participate" :loading="loadingParticipate"
-                    :disabled="event.participating">
-              Participate
+                    :disabled="event.participating" v-if="!isParticipating">
+              Participer
+            </Button>
+            <Button variant="destructive" @click="participate" :loading="loadingParticipate"
+                    :disabled="event.participating" v-else>
+              Annuler participation
             </Button>
           </div>
         </div>
@@ -82,7 +98,7 @@ async function participate() {
             <Users class="w-6 h-6"/>
           </div>
           <div>
-            <p class="text-lg font-semibold text-gray-800">Organized By</p>
+            <p class="text-lg font-semibold text-gray-800">Organize par</p>
             <p class="text-sm text-gray-600">{{ event.organized_by.login }}</p>
             <p class="text-sm text-gray-500">{{ event.organized_by.email }}</p>
           </div>
@@ -116,7 +132,7 @@ async function participate() {
             <div class="flex items-center justify-center w-12 h-12 bg-rose-100 rounded-full text-rose-600">
               <DollarSign class="w-6 h-6"/>
             </div>
-            <p class="mt-2 text-lg font-semibold text-rose-700">Price</p>
+            <p class="mt-2 text-lg font-semibold text-rose-700">Prix</p>
             <p class="mt-1 text-sm text-rose-600">{{ event.price }}€</p>
           </div>
         </div>
