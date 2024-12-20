@@ -34,7 +34,8 @@ const routes = [
 				path: 'event/:id',
 				name: 'Event',
 				component: EventPage
-			}
+			},
+
 		]
 	},
 	{

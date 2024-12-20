@@ -8,7 +8,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <Button @click="handleLogout" :loading="userStore.loading">
+  <Button class="w-full" @click="handleLogout" :loading="userStore.loading">
     Logout
   </Button>
 </template>

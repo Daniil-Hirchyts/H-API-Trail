@@ -1,7 +1,7 @@
 import {get} from '@/lib/api.ts';
 import {toast} from 'vue-sonner';
 
-type ApiSportType = {
+export type ApiSportType = {
 	id: number,
 	name: string,
 	localisation: string,
