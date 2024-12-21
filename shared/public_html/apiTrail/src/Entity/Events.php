@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Repository\EventsRepository;
+use App\State\AddCountsToEvents;
 use App\State\AddInfoToEvent;
 use App\State\EventsProcessor;
 use App\State\GetInfoParticipationProcessor;
@@ -24,7 +25,11 @@ use Symfony\Flex\Unpack\Operation;
 #[ApiResource(
     operations: [
         new GetCollection(
-            description: "Récupère les events"
+            description: "Récupère les events",
+            normalizationContext: ['groups' => ['event:readInfo', 'event:read', 'event:readCount', 'infoparticipation:read']],
+            denormalizationContext: ['groups' => ['event:write']],
+            validationContext: ['groups' => ['Default', 'event:write', 'event:read', 'infoparticipation:read']],
+            provider: AddCountsToEvents::class,
         ),
         new GetCollection(
             uriTemplate: '/utilisateurs/{idOrga}/events',
@@ -74,57 +79,57 @@ class Events
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['infoparticipation:read','event:read', 'participation:utilisateur:read', 'participation:event:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read', 'event:readinfo','event:read', 'participation:utilisateur:read', 'participation:event:read','participation:utilisateur:event:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?\DateTimeInterface $start_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?\DateTimeInterface $end_at = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private array $sport = [];
 
     #[ORM\Column(length: 255)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $localisation = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['infoparticipation:read','event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?int $max_participants = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    #[Groups(['event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read'])]
+    #[Groups(['event:create', 'event:update','event:readinfo','event:write', 'event:read', 'participation:utilisateur:read'])]
     private ?bool $participants_visible = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['infoparticipation:read','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:create', 'event:update','event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['infoparticipation:read','event:read', 'event:create', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
+    #[Groups(['infoparticipation:read','event:readinfo','event:read', 'event:create', 'event:write', 'event:read', 'participation:utilisateur:read','participation:utilisateur:event:read'])]
     #[ApiProperty(readable: true, writable: false)]
     private ?Utilisateurs $organized_by = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:write', 'event:read', 'participation:utilisateur:read'])]
+    #[Groups(['event:write', 'event:read','event:readinfo', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Groups(['event:write', 'event:read', 'participation:utilisateur:read'])]
+    #[Groups(['event:write', 'event:read','event:readinfo', 'participation:utilisateur:read'])]
     private ?\DateTimeInterface $updated_at = null;
 
     /**
@@ -134,8 +139,21 @@ class Events
     #[Groups(['event:read'])]
     private Collection $participations;
 
-    #[Groups(['event:details', 'event:write'])]
+    #[Groups(['event:details', 'event:write' ,'participation:utilisateur:event:write', 'participation:utilisateur:read', 'participation:utilisateur:event:read'])]
     private bool $participating = false;
+
+    #[Groups(['event:details', 'event:write' ,'participation:utilisateur:event:write', 'participation:utilisateur:read', 'event:readCount', 'participation:utilisateur:event:read'])]
+    private int $countOfParticipation = 0;
+
+    public function isCountOfParticipation(): int
+    {
+        return $this->countOfParticipation;
+    }
+
+    public function setCountOfParticipation(int $countOfParticipation): void
+    {
+        $this->countOfParticipation = $countOfParticipation;
+    }
 
     public function getValueOfChecker(): string
     {

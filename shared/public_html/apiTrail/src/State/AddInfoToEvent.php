@@ -37,6 +37,8 @@ class AddInfoToEvent implements ProviderInterface
             }
         }
 
+        $event->setCountOfParticipation($this->participationsRepository->getCountOfParticipationsByEvent($event->getId()));
+
         return $event;
     }
 }

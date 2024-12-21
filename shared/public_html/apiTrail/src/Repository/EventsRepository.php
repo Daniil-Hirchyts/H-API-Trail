@@ -16,6 +16,13 @@ class EventsRepository extends ServiceEntityRepository
         parent::__construct($registry, Events::class);
     }
 
+    public function findAllIds(): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $qb->select('e.id');
+        return $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Events[] Returns an array of Events objects
     //     */

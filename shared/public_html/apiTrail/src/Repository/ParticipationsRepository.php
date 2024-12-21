@@ -53,7 +53,15 @@ class ParticipationsRepository extends ServiceEntityRepository
         $qb->select('COUNT(p.id)');
         $qb->andWhere('p.event = :eventId');
         $qb->setParameter('eventId', $eventId);
-        return $qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function getAllFromUserId($userId): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb->andWhere('p.user = :userId');
+        $qb->setParameter('userId', $userId);
+        return $qb->getQuery()->getResult();
     }
 
     //    /**

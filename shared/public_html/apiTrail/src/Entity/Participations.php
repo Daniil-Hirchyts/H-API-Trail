@@ -10,6 +10,8 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\ParticipationsRepository;
+use App\State\AddCountsToEvents;
+use App\State\AddInfoToAllEvents;
 use App\State\DeleteParticipationProcessor;
 use App\State\ParticipationUtilisateurProcessor;
 use Doctrine\ORM\Mapping\Column;
@@ -69,7 +71,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
     ],
     normalizationContext: ["groups" => ['participation:utilisateur:event:read']],
     denormalizationContext: ["groups" => ['participation:utilisateur:event:write']],
-    validationContext: ["groups" => ["Default", 'participation:utilisateur:event:write']],
+    validationContext: ["groups" => ["Default", 'participation:utilisateur:event:write', 'participation:utilisateur:event:read']],
+    provider: AddInfoToAllEvents::class,
 )]
 #[ApiResource(
     operations: [
