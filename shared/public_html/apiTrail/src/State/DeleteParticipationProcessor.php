@@ -22,19 +22,20 @@ class DeleteParticipationProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         //verifi si l'utilisateur est l'owner de la participation si lutilisateur n'est pas admin
-        $userIdProvided = $uriVariables['idUser'] ?? null;
-        $idEvent = $uriVariables['idEvent'] ?? null;
-        if (!$userIdProvided || !$idEvent) {
-            throw new \Exception('User not found or not authorized.');
+        $userId = $data->getUser()->getId() ?? null;
+        $idEvent = $data->getEvent()->getId() ?? null;
+        if (!$userId || !$idEvent) {
+            throw new \Exception('User id or event id not provided.');
         } else {
-            $participation = $this->participationsRepository->getParticipationByData($userIdProvided, $idEvent);
+            $participation = $this->participationsRepository->getParticipationByData($userId, $idEvent);
         }
 
         $actualUser = $this->security->getUser();
 
-        if (!$this->security->isGranted('ROLE_ADMIN') && $actualUser->getId() !== $userIdProvided) {
+        if (!$this->security->isGranted('ROLE_ADMIN') && $actualUser->getId() !== $userId) {
             throw new \Exception('User not found or not authorized.');
         }
+
 
         $userIdOfParticipation = $participation->getUser()->getId();
 

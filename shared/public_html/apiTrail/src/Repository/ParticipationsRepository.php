@@ -39,11 +39,12 @@ class ParticipationsRepository extends ServiceEntityRepository
     public function getParticipationByData($userId, $eventId)
     {
         $qb = $this->createQueryBuilder('p');
+        $qb->select('p');
         $qb->andWhere('p.event = :eventId');
         $qb->andWhere('p.user = :userId');
         $qb->setParameter('eventId', $eventId);
         $qb->setParameter('userId', $userId);
-        return $qb->getQuery()->getSingleScalarResult();
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     public function getCountOfParticipationsByEvent($eventId): int

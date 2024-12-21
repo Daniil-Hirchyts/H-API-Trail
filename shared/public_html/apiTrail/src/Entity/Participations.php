@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\ParticipationsRepository;
 use App\State\DeleteParticipationProcessor;
-use App\State\GetInfoParticipationProcessor;
 use App\State\ParticipationUtilisateurProcessor;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -22,7 +21,6 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-use function MongoDB\BSON\toJSON;
 
 
 #[ApiResource(
@@ -44,7 +42,6 @@ use function MongoDB\BSON\toJSON;
         new Get(
             description: "Récupérer une participation",
             security: "is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')",
-            processor: GetInfoParticipationProcessor::class
         ),
     ],
     uriVariables: [
@@ -75,22 +72,11 @@ use function MongoDB\BSON\toJSON;
     validationContext: ["groups" => ["Default", 'participation:utilisateur:event:write']],
 )]
 #[ApiResource(
-    uriTemplate: '/utilisateurs/{idUser}/events/{idEvent}',
     operations: [
         new Delete(
             description: "Supprimer une participation",
             security: "is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')",
             processor: DeleteParticipationProcessor::class,
-        )
-    ],
-    uriVariables: [
-        'idUser' => new Link(
-            toProperty: 'user',
-            fromClass: Utilisateurs::class,
-        ),
-        'idEvent' => new Link(
-            toProperty: 'event',
-            fromClass: Events::class,
         )
     ],
     normalizationContext: ["groups" => ['participation:event:read']],
