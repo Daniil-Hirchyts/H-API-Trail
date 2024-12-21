@@ -35,7 +35,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $sql = $this->createQueryBuilder('u')
             ->select('u.username,u.code, SUBSTRING(u.bio, 1, 201) AS bio, u.avatar, u.name, u.lastname');
-        if ($this->security->isAdmin()) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return $sql->getQuery()->getArrayResult();
         }
         return $sql->where('u.visible = TRUE')
@@ -82,7 +82,7 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('query', '%' . strtolower($query) . '%')
             ->orderBy('u.id', 'ASC');
 
-        if ($this->security->isAdmin()) {
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return $sql->getQuery()->getArrayResult();
         }
         return $sql->andWhere('u.visible = TRUE')->getQuery()->getArrayResult();
