@@ -1,20 +1,27 @@
 <script setup lang="ts">
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {DatePicker} from '@/components/ui/date-picker';
-import {Checkbox} from "@/components/ui/checkbox";
-import {Popover, PopoverTrigger, PopoverContent} from '@/components/ui/popover';
-import {Command, CommandList, CommandInput, CommandItem, CommandGroup, CommandEmpty} from '@/components/ui/command';
-import {ref, computed} from "vue";
+import {Checkbox} from '@/components/ui/checkbox';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
+import {computed, ref} from 'vue';
 import {toast} from 'vue-sonner';
 import {eventStore, sports} from '@/stores/event.store.ts';
 
 const dateRange = ref({
   start: null,
-  end: null,
+  end: null
 });
 const openDialog = ref(false);
 const selectedSports = ref<string[]>([]);
@@ -58,12 +65,12 @@ async function handleSubmit(e: Event) {
     name: formEntries['name'] as string,
     localisation: formEntries['localisation'] as string,
     description: formEntries['description'] as string,
-    start_at: new Date(value.start).toISOString(),
-    end_at: new Date(value.end).toISOString(),
+    start_at: new Date(value.start),
+    end_at: new Date(value.end),
     price: parseFloat(formEntries['price'] as string) || 0,
     max_participants: parseInt(formEntries['maxParticipants'] as string, 10) || 0,
     participants_visible: formEntries['showParticipants'] === 'true',
-    sport: selectedSports.value,
+    sport: selectedSports.value
   };
 
   const newEvent = await eventStore.createEvent(eventData);

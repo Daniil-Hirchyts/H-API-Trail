@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {defineEmits, defineProps, ref, watch} from 'vue'
-import {Popover, PopoverContent, PopoverTrigger,} from '@/components/ui/popover'
+import {Ref, ref, watch} from 'vue';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 
 import {
   RangeCalendarCell,
@@ -9,103 +9,104 @@ import {
   RangeCalendarGridBody,
   RangeCalendarGridHead,
   RangeCalendarGridRow,
-  RangeCalendarHeadCell,
-} from '@/components/ui/range-calendar'
+  RangeCalendarHeadCell
+} from '@/components/ui/range-calendar';
 
-import {CalendarDate, type DateValue, isEqualMonth,} from '@internationalized/date'
+import {CalendarDate, type DateValue, isEqualMonth} from '@internationalized/date';
 
-import {Calendar as CalendarIcon, ChevronLeft, ChevronRight,} from 'lucide-vue-next'
+import {Calendar as CalendarIcon, ChevronLeft, ChevronRight} from 'lucide-vue-next';
 
-import {type DateRange, RangeCalendarRoot, useDateFormatter} from 'radix-vue'
-import {createMonth, type Grid, toDate} from 'radix-vue/date'
-import {cn} from "@/lib/utils.ts";
+import {type DateRange, RangeCalendarRoot, useDateFormatter} from 'radix-vue';
+import {createMonth, type Grid, toDate} from 'radix-vue/date';
+import {cn} from '@/lib/utils.ts';
 
 // Accept modelValue with optional start/end
 const props = defineProps({
   modelValue: {
     type: Object,
-    default: () => ({ start: null, end: null })
+    default: () => ({start: null, end: null})
   }
-})
+});
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 // Ensure we have a fallback date if null
-const fallbackStart = new CalendarDate(2022, 1, 1)
-const fallbackEnd = fallbackStart.add({ days: 7 }) // Arbitrary default range
+const fallbackStart = new CalendarDate(2022, 1, 1);
+const fallbackEnd = fallbackStart.add({days: 7}); // Arbitrary default range
 
 // Convert modelValue to CalendarDate if available, else use fallback
 const initialStart = props.modelValue.start
     ? new CalendarDate(props.modelValue.start.getFullYear(), props.modelValue.start.getMonth() + 1, props.modelValue.start.getDate())
-    : fallbackStart
+    : fallbackStart;
 
 const initialEnd = props.modelValue.end
     ? new CalendarDate(props.modelValue.end.getFullYear(), props.modelValue.end.getMonth() + 1, props.modelValue.end.getDate())
-    : fallbackEnd
+    : fallbackEnd;
 
 const value = ref<DateRange>({
   start: initialStart,
-  end: initialEnd,
-})
+  end: initialEnd
+});
 
-const locale = ref('en-US')
-const formatter = useDateFormatter(locale.value)
+const locale = ref('en-US');
+const formatter = useDateFormatter(locale.value);
 
 // Ensure placeholders are never null
-const placeholder = ref(value.value.start)
-const secondMonthPlaceholder = ref(value.value.end)
+const placeholder = ref<CalendarDate>(initialStart);
+const secondMonthPlaceholder = ref<CalendarDate>(initialEnd);
 
 // Create initial months
 const firstMonth = ref(
     createMonth({
-      dateObj: placeholder.value,
+      dateObj: initialStart,
       locale: locale.value,
       fixedWeeks: true,
-      weekStartsOn: 0,
+      weekStartsOn: 0
     })
-) as unknown as Ref<Grid<DateValue>>
+) as unknown as Ref<Grid<DateValue>>;
 
 const secondMonth = ref(
     createMonth({
-      dateObj: secondMonthPlaceholder.value,
+      dateObj: initialEnd,
       locale: locale.value,
       fixedWeeks: true,
-      weekStartsOn: 0,
+      weekStartsOn: 0
     })
-) as unknown as Ref<Grid<DateValue>>
+) as unknown as Ref<Grid<DateValue>>;
 
 function updateMonth(reference: 'first' | 'second', months: number) {
   if (reference === 'first') {
-    placeholder.value = placeholder.value.add({ months })
+    placeholder.value = placeholder.value.add({months});
   } else {
-    secondMonthPlaceholder.value = secondMonthPlaceholder.value.add({ months })
+    secondMonthPlaceholder.value = secondMonthPlaceholder.value.add({months});
   }
 }
 
 watch(placeholder, (_placeholder) => {
-  if (!_placeholder) return
+  if (!_placeholder) return;
   firstMonth.value = createMonth({
-    dateObj: _placeholder,
+    dateObj: _placeholder as CalendarDate,
     weekStartsOn: 0,
     fixedWeeks: false,
-    locale: locale.value,
-  })
-  if (isEqualMonth(secondMonthPlaceholder.value, _placeholder)) {
-    secondMonthPlaceholder.value = secondMonthPlaceholder.value.add({ months: 1 })
+    locale: locale.value
+  });
+  if (isEqualMonth(secondMonthPlaceholder.value as CalendarDate, _placeholder as CalendarDate)) {
+    secondMonthPlaceholder.value = secondMonthPlaceholder.value.add({months: 1});
   }
-})
+});
 
 watch(secondMonthPlaceholder, (_secondMonthPlaceholder) => {
-  if (!_secondMonthPlaceholder) return
+  if (!_secondMonthPlaceholder) return;
   secondMonth.value = createMonth({
-    dateObj: _secondMonthPlaceholder,
+    dateObj: _secondMonthPlaceholder as CalendarDate,
     weekStartsOn: 0,
     fixedWeeks: false,
-    locale: locale.value,
-  })
-  if (isEqualMonth(_secondMonthPlaceholder, placeholder.value))
-    placeholder.value = placeholder.value.subtract({ months: 1 })
-})
+    locale: locale.value
+  });
+  if (isEqualMonth(_secondMonthPlaceholder as CalendarDate, placeholder.value as CalendarDate)) {
+    placeholder.value = placeholder.value.subtract({months: 1});
+  }
+});
 
 // Emit updates as JS Dates when the user changes the selection
 watch(value, (newVal) => {
@@ -115,9 +116,9 @@ watch(value, (newVal) => {
         : null,
     end: newVal.end
         ? new Date(newVal.end.year, newVal.end.month - 1, newVal.end.day)
-        : null,
-  })
-})
+        : null
+  });
+});
 </script>
 
 <template>
@@ -126,7 +127,7 @@ watch(value, (newVal) => {
       <button
           class="w-full justify-start text-left font-normal border border-gray-300 rounded-md px-3 py-2 flex flex-row items-center"
       >
-        <CalendarIcon class="mr-2 h-4 w-4" />
+        <CalendarIcon class="mr-2 h-4 w-4"/>
         <template v-if="modelValue.start && modelValue.end">
           {{ modelValue.start.toLocaleDateString() }} - {{ modelValue.end.toLocaleDateString() }}
         </template>
@@ -139,7 +140,8 @@ watch(value, (newVal) => {
       </button>
     </PopoverTrigger>
     <PopoverContent class="w-auto p-0">
-      <RangeCalendarRoot v-slot="{ weekDays }" v-model="value" v-model:placeholder="placeholder" class="p-3">
+      <RangeCalendarRoot v-slot="{ weekDays }" v-model="value as DateRange"
+                         v-model:placeholder="placeholder as DateValue" class="p-3">
         <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
@@ -147,7 +149,7 @@ watch(value, (newVal) => {
                   :class="cn('h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-transparent rounded')"
                   @click="updateMonth('first', -1)"
               >
-                <ChevronLeft class="h-4 w-4" />
+                <ChevronLeft class="h-4 w-4"/>
               </button>
               <div class="text-sm font-medium">
                 {{ formatter.fullMonthAndYear(toDate(firstMonth.value)) }}
@@ -156,7 +158,7 @@ watch(value, (newVal) => {
                   :class="cn('h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-transparent rounded')"
                   @click="updateMonth('first', 1)"
               >
-                <ChevronRight class="h-4 w-4" />
+                <ChevronRight class="h-4 w-4"/>
               </button>
             </div>
             <RangeCalendarGrid>
@@ -197,7 +199,7 @@ watch(value, (newVal) => {
                   :class="cn('h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-transparent rounded')"
                   @click="updateMonth('second', -1)"
               >
-                <ChevronLeft class="h-4 w-4" />
+                <ChevronLeft class="h-4 w-4"/>
               </button>
               <div class="text-sm font-medium">
                 {{ formatter.fullMonthAndYear(toDate(secondMonth.value)) }}
@@ -206,7 +208,7 @@ watch(value, (newVal) => {
                   :class="cn('h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 border border-transparent rounded')"
                   @click="updateMonth('second', 1)"
               >
-                <ChevronRight class="h-4 w-4" />
+                <ChevronRight class="h-4 w-4"/>
               </button>
             </div>
             <RangeCalendarGrid>

@@ -8,7 +8,7 @@ import {eventStore} from '@/stores/event.store';
 import {Loader} from '@/components/ui/loader';
 import {Calendar, DollarSign, MapPin, Users} from 'lucide-vue-next';
 import {EventService} from '@/lib/services/event.service.ts';
-import {userStore} from "@/stores/user.store.ts";
+import {userStore} from '@/stores/user.store.ts';
 
 const route = useRoute();
 const router = useRouter();
@@ -42,6 +42,7 @@ async function toggleParticipation() {
         (p) => p.user.id === userStore.getUser()?.id
     );
     if (participation) {
+      // @ts-ignore
       const success = await EventService.deleteParticipation(participation.id);
       if (success) {
         eventStore.removeParticipation(event.value.id);
@@ -91,7 +92,7 @@ async function toggleParticipation() {
               {{ sport }}
             </Badge>
           </div>
-          <div class="w-full max-w-4xl flex justify-end mt-6" >
+          <div class="w-full max-w-4xl flex justify-end mt-6">
             <Button variant="destructive" v-if="initialized" @click="toggleParticipation" :loading="loadingAction">
               {{ isParticipating ? 'Annuler participation' : 'Participer' }}
             </Button>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
+import {Input, PasswordInput} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {useRouter} from 'vue-router';
 import {ref} from 'vue';
@@ -9,9 +9,8 @@ import {toast} from 'vue-sonner';
 import {getAnnuaireUserData} from '@/lib/annuaire-api.ts';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {InfoIcon} from 'lucide-vue-next';
-import {userStore} from "@/stores/user.store.ts";
-import {Checkbox} from "@/components/ui/checkbox";
-import {PasswordInput} from '@/components/ui/input';
+import {userStore} from '@/stores/user.store.ts';
+import {Checkbox} from '@/components/ui/checkbox';
 
 const annuaireLoading = ref(false);
 const code = ref('');
@@ -41,7 +40,8 @@ async function handleSubmit(e: Event) {
     return;
   }
   const form = new FormData(e.target as HTMLFormElement);
-  const roles = form.get('roleOrga') === 'true' ? ["ROLE_ORGA"] : [];
+  const data = Object.fromEntries(form.entries());
+  const roles = data.roleOrga === 'true' ? ['ROLE_ORGA'] : [];
   saving.value = true;
   const success = await userStore.register(
       username.value,
