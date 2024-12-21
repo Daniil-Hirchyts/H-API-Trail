@@ -8,6 +8,7 @@ use App\Repository\EventsRepository;
 use App\Repository\ParticipationsRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Response;
 
 class ParticipationUtilisateurProcessor implements ProcessorInterface
 {
@@ -56,7 +57,13 @@ class ParticipationUtilisateurProcessor implements ProcessorInterface
             throw new \Exception('User is already registered for this event.');
         }
 
-        $this->verifyIfAnyDatesOfAParticipationOverlapWithUs($event, $userId, $eventId);
+        try{
+            $this->verifyIfAnyDatesOfAParticipationOverlapWithUs($event, $userId, $eventId);
+        } catch (\Exception $e) {
+            http_response_code(409);
+            echo json_encode(['error' => $e->getMessage(), 'error_code' => 'overlapse']);
+            return new Response(null, 409, ['Content-Type' => 'application/json']);
+        }
 
         $data->setUser($actualUser);
         $data->setEvent($event);
@@ -76,8 +83,8 @@ class ParticipationUtilisateurProcessor implements ProcessorInterface
                 continue;
             }
             if (
-                ($event->getStartAt() >= $participatedEvent->getStartAt() && $event->getStartAt() <= $participatedEvent->getEndAt()) ||
-                ($event->getEndAt() >= $participatedEvent->getEndAt() && $event->getEndAt() <= $participatedEvent->getEndAt())
+                $event->getStartAt() <= $participatedEvent->getEndAt() &&
+                $event->getEndAt() >= $participatedEvent->getStartAt()
             ) {
                 throw new \Exception('Event dates overlap with another event the user is participating in.');
             }
