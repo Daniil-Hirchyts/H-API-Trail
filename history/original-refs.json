@@ -1,0 +1,108 @@
+{
+  "sources": [
+    {
+      "source": "3Guys1Project/apiTrail",
+      "folder": "api",
+      "selected_branch": "dev",
+      "head": "7f06347b9ddc43125347f8795a9c0840d45f0ab1",
+      "default_branch": "main",
+      "default_head": "fd22ebe5db84ebf81cdbb4e5f2aecd2224648e5d"
+    },
+    {
+      "source": "3Guys1Project/H-API-Trail",
+      "folder": "frontend",
+      "selected_branch": "developpement",
+      "head": "9073fd29859c54ddd899622039d1a0135cd8da8b",
+      "default_branch": "developpement",
+      "default_head": "9073fd29859c54ddd899622039d1a0135cd8da8b"
+    },
+    {
+      "source": "3Guys1Project/SAEAnnuaire",
+      "folder": "directory",
+      "selected_branch": "dev",
+      "head": "135f68fcffee62405fe94fa6d38e8a3f12284f4b",
+      "default_branch": "main",
+      "default_head": "5213bab2c00cedf4e0409a5ff85ee721912288f9"
+    },
+    {
+      "source": "3Guys1Project/Rendu",
+      "folder": "submission",
+      "selected_branch": "master",
+      "head": "c86106bd3de8bd8070f817b88e61eb2215b4fe86",
+      "default_branch": "master",
+      "default_head": "c86106bd3de8bd8070f817b88e61eb2215b4fe86"
+    }
+  ],
+  "refs": [
+    {
+      "repository": "3Guys1Project/apiTrail",
+      "ref": "refs/heads/base",
+      "sha": "82b8610e24a547e0da71b25139cf63dbf7723cb5"
+    },
+    {
+      "repository": "3Guys1Project/apiTrail",
+      "ref": "refs/heads/clement",
+      "sha": "7084c7ed85863f33c2806e6c014a932f46ac539e"
+    },
+    {
+      "repository": "3Guys1Project/apiTrail",
+      "ref": "refs/heads/daniil",
+      "sha": "14eb9f0c8fd0b4a75c4021a3e995b8fb30bc50b6"
+    },
+    {
+      "repository": "3Guys1Project/apiTrail",
+      "ref": "refs/heads/dev",
+      "sha": "7f06347b9ddc43125347f8795a9c0840d45f0ab1"
+    },
+    {
+      "repository": "3Guys1Project/apiTrail",
+      "ref": "refs/heads/main",
+      "sha": "fd22ebe5db84ebf81cdbb4e5f2aecd2224648e5d"
+    },
+    {
+      "repository": "3Guys1Project/apiTrail",
+      "ref": "refs/heads/marius",
+      "sha": "14eb9f0c8fd0b4a75c4021a3e995b8fb30bc50b6"
+    },
+    {
+      "repository": "3Guys1Project/H-API-Trail",
+      "ref": "refs/heads/developpement",
+      "sha": "9073fd29859c54ddd899622039d1a0135cd8da8b"
+    },
+    {
+      "repository": "3Guys1Project/H-API-Trail",
+      "ref": "refs/heads/main",
+      "sha": "004452da0d6cd09de2aab6d3c6c2ec437b92fa94"
+    },
+    {
+      "repository": "3Guys1Project/H-API-Trail",
+      "ref": "refs/heads/marius",
+      "sha": "08cccac74ca955d683bfdcfb3c112e0b032a9629"
+    },
+    {
+      "repository": "3Guys1Project/SAEAnnuaire",
+      "ref": "refs/heads/Auth",
+      "sha": "d2356f7e5f41928b0d52d99aa65559cf5bb6d37d"
+    },
+    {
+      "repository": "3Guys1Project/SAEAnnuaire",
+      "ref": "refs/heads/dev",
+      "sha": "135f68fcffee62405fe94fa6d38e8a3f12284f4b"
+    },
+    {
+      "repository": "3Guys1Project/SAEAnnuaire",
+      "ref": "refs/heads/home",
+      "sha": "ff54441f1bedf3de5d57d270e5d2c61dff6becce"
+    },
+    {
+      "repository": "3Guys1Project/SAEAnnuaire",
+      "ref": "refs/heads/main",
+      "sha": "5213bab2c00cedf4e0409a5ff85ee721912288f9"
+    },
+    {
+      "repository": "3Guys1Project/Rendu",
+      "ref": "refs/heads/master",
+      "sha": "c86106bd3de8bd8070f817b88e61eb2215b4fe86"
+    }
+  ]
+}

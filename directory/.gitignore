@@ -1,0 +1,5 @@
+.env.prod
+.DS_Store
+/.idea
+app/.env
+app/.env.dev

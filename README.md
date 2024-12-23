@@ -1,111 +1,69 @@
-# Documentation de l'API
+# H-API Trail
 
-## Dépôt Git
+**Sports events, registrations and a member directory · 2024**
 
-Le code source complet du projet est disponible sur GitHub :
-[3Guys1Project/apiTrail](https://github.com/3Guys1Project/apiTrail)
+We developed **H-API Trail** as a team academic project for managing running and cycling events. The work combined a REST API, a Vue web client, a separate member directory and a final Docker-based submission containing the applications together.
 
-## Endpoints de l'API
+The platform covered road running, trail running, mountain biking and road cycling. Users could browse events, manage their accounts and register for events, while organisers managed event information and participation.
 
-Ci-dessous, vous trouverez une liste des routes disponibles dans l'API. Elle prend en charge les méthodes HTTP standards (GET, POST, PATCH, DELETE) pour faciliter les opérations CRUD sur les ressources.
+## Components
 
-### Authentification
+| Component | Source snapshot | Completed work |
+| --- | --- | --- |
+| [REST API](api/) | `apiTrail`, branch `dev` | Users, authentication, events, participation records and role-dependent operations. |
+| [Web client](frontend/) | `H-API-Trail`, branch `developpement` | Event browsing, event details, registration, account views and organiser forms. |
+| [Member directory](directory/) | `SAEAnnuaire`, branch `dev` | Registration, searchable profiles, profile editing, comments and profile-data access. |
+| [Final submission](submission/) | `Rendu`, branch `master` | The assembled applications, Docker configuration, database scripts and delivery notes. |
 
-- **Enregistrer un nouvel utilisateur**
-    - `POST /api/auth/register`
-- **Connexion**
-    - `POST /api/auth/login`
+The implemented development snapshots were retained alongside the final submission. All original histories, including the other branches, were preserved separately from the choice of application snapshot.
 
-### Utilisateurs
+## REST API
 
-- **Récupérer tous les utilisateurs**
-    - `GET /api/utilisateurs`
-- **Récupérer un utilisateur par ID**
-    - `GET /api/utilisateurs/{id}`
-- **Mettre à jour un utilisateur par ID**
-    - `PATCH /api/utilisateurs/{id}`
-- **Supprimer un utilisateur par ID**
-    - `DELETE /api/utilisateurs/{id}`
-- **Changer le rôle d’un utilisateur**
-    - `PATCH /api/utilisateurs/{id}/changeRole`
+We implemented the backend with **Symfony 6.4**, **API Platform 4**, Doctrine and a MySQL database. Its resources represented users, events and participations.
 
-### Événements
+The implementation included:
 
-- **Récupérer tous les événements**
-    - `GET /api/events`
-- **Récupérer un événement par ID**
-    - `GET /api/events/{id}`
-- **Créer un nouvel événement**
-    - `POST /api/events`
-- **Mettre à jour un événement par ID**
-    - `PATCH /api/events/{id}`
-- **Supprimer un événement par ID**
-    - `DELETE /api/events/{id}`
-- **Récupérer les événements d'un utilisateur**
-    - `GET /api/utilisateurs/{idOrga}/events`
+- Account registration, login and JWT-based authentication, with refresh-token support.
+- User information and roles for participants, organisers and administrators.
+- Event creation, retrieval, updates and deletion.
+- Event dates, locations, sport categories, descriptions, capacity and prices.
+- Participation registration, cancellation and event/user participation views.
+- Validation, access-control logic, API state processors and database migrations.
 
-### Participations
+Source: [entities](api/shared/public_html/apiTrail/src/Entity/), [state processors](api/shared/public_html/apiTrail/src/State/) and [API documentation](api/README.md).
 
-- **Récupérer toutes les participations**
-    - `GET /api/participations`
-- **Récupérer une participation par ID**
-    - `GET /api/participations/{id}`
-- **Créer une nouvelle participation**
-    - `POST /api/participations`
-- **Récupérer les participations d'un utilisateurs**
-    - `GET /api/utilisateurs/{idUser}/participations`
-- **Supprimer une participation spécifique d'un utilisateur**
-    - `DELETE /api/utilisateurs/{idUser}/participations/{idParticipation}`
-- **Récupérer les participations d'un événement**
-    - `GET /api/events/{idEvent}/participations`
+## Vue web client
 
-## Sécurité et Authentification
+The client provided the interface for browsing events and using the API. We built event cards and detail pages, registration and login screens, a participation view, profile editing and an event-creation dialog.
 
-L'API utilise des jetons JWT pour une authentification sécurisée des utilisateurs, lesquels sont retournés sous forme de cookies pour assurer une gestion sécurisée des sessions. Le contrôle d'accès est mis en place pour restreindre l'accès aux opérations sensibles en fonction des rôles des utilisateurs.
+Vue Router separated the authentication and application layouts. Client stores and service modules handled account state, event data and API requests. The frontend also retrieved additional profile information from the directory.
 
-## Lancement de l’API
+The interface used **Vue 3**, **TypeScript**, **Vite**, Tailwind CSS and reusable Radix/shadcn-vue components.
 
-Le projet utilise Docker pour une configuration simplifiée en environnement de développement et de production. Voici comment démarrer l’API en utilisant Docker Compose et les différents fichiers de configuration.
+Source: [views](frontend/src/views/), [API services](frontend/src/lib/services/), [routing](frontend/src/lib/routes.ts) and [directory integration](frontend/src/lib/annuaire-api.ts).
 
-### Prérequis
+## Member directory
 
-Assurez-vous d'avoir installé Docker et Docker Compose sur votre machine.
+The directory was a separate **Symfony 7.1** application with Twig views, Doctrine and PostgreSQL. It included account registration and login, profile search, profile pages, editing forms and account-management actions.
 
-### Instructions de Lancement
+Profiles included contact details, a biography, a website, occupation information, an avatar, a banner and visibility settings. Comment entities and forms supported interaction on profiles, while a JSON profile endpoint exposed information to the event client.
 
-1. **Choix de l'environnement** :
-    - **Développement** : Ce mode utilise des volumes partagés pour un développement interactif.
-    - **Production** : Ce mode configure l’API pour un environnement de production avec des variables d'environnement adaptées.
+Source: [controllers](directory/app/src/Controller/), [entities](directory/app/src/Entity/) and [forms](directory/app/src/Form/).
 
-2. **Démarrage de l'API** :
-    - Pour lancer en mode **développement** :
-      ```bash
-      ./run.sh dev
-      ```
-      Ce mode utilise `compose.yaml` pour monter les volumes de développement et expose des ports supplémentaires.
+## Final delivery
 
-    - Pour lancer en mode **production** :
-      ```bash
-      ./run.sh prod
-      ```
-      Ce mode utilise à la fois `compose.yaml` et `compose.prod.yaml` pour une configuration adaptée en production, sans volumes partagés et avec les ports standards.
+The [submission](submission/) brought the API, client and directory together with Docker Compose configurations and SQL scripts for the two databases. The component source trees, environment configuration and build scripts were retained as delivered.
 
-3. **Configuration des JWT** :
-   Pour que l'authentification avec JWT fonctionne correctement, exécutez la commande suivante pour générer les clés de chiffrement JWT :
-   ```bash
-   php bin/console lexik:jwt:generate-keypair
-   
-4. **Accès à l'API** :
-    - En mode **développement** : Accès à `http://localhost:80` (ou port spécifié).
-    - En mode **production** : Accès à `https://localhost:443` avec un certificat SSL auto-signé.
+The original delivery notes recorded a directory-path issue on the IUT hosting server and possible cookie conflicts during token refresh. Those notes remained in the [submission README](submission/README.md).
 
+## Team and history
 
-## Répartition des contributions
+- **[Marius Brouty](https://github.com/Marius-brt)**
+- **[Clément Garro](https://github.com/Clement-Garro)**
+- **[Daniil Hirchyts](https://github.com/Daniil-Hirchyts)**
 
-Chaque membre a contribué de manière équitable au développement du projet :
+The original histories recorded work from September to December 2024. Branch references and the selected snapshots were recorded in [history/original-refs.json](history/original-refs.json), with original authorship and commit objects retained.
 
-- **Clément Garro** - Implémentation des routes d’utilisateur et d’authentification. Développement de la gestion des 
-  événements et des participations.
-- **Marius Brouty** - Développement de la gestion des événements et des participations, gestion des JWT.
-- **Daniil Hirchyts** - Configuration des fonctionnalités de sécurité, gestion des JWT, gestion des événements.
+## Licensing
 
+The existing package declarations were retained: the Symfony applications declared `proprietary`, and the directory's asset package declared `UNLICENSED`. The declarations and their source files were recorded in [LICENSES.md](LICENSES.md). Third-party components retained their original notices.
