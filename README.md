@@ -8,14 +8,12 @@ The platform covered road running, trail running, mountain biking and road cycli
 
 ## Components
 
-| Component | Source snapshot | Completed work |
-| --- | --- | --- |
-| [REST API](api/) | `apiTrail`, branch `dev` | Users, authentication, events, participation records and role-dependent operations. |
-| [Web client](frontend/) | `H-API-Trail`, branch `developpement` | Event browsing, event details, registration, account views and organiser forms. |
-| [Member directory](directory/) | `SAEAnnuaire`, branch `dev` | Registration, searchable profiles, profile editing, comments and profile-data access. |
-| [Final submission](submission/) | `Rendu`, branch `master` | The assembled applications, Docker configuration, database scripts and delivery notes. |
-
-The implemented development snapshots were retained alongside the final submission. All original histories, including the other branches, were preserved separately from the choice of application snapshot.
+| Component | Features |
+| --- | --- |
+| [REST API](api/) | Users, authentication, events, participation records and role-dependent operations. |
+| [Web client](frontend/) | Event browsing, event details, registration, account views and organiser forms. |
+| [Member directory](directory/) | Registration, searchable profiles, profile editing, comments and profile-data access. |
+| [Final submission](submission/) | The assembled applications, Docker configuration, database scripts and delivery notes. |
 
 ## REST API
 
@@ -52,18 +50,16 @@ Source: [controllers](directory/app/src/Controller/), [entities](directory/app/s
 
 ## Final delivery
 
-The [submission](submission/) brought the API, client and directory together with Docker Compose configurations and SQL scripts for the two databases. The component source trees, environment configuration and build scripts were retained as delivered.
+The [submission](submission/) brought the API, client and directory together with Docker Compose configurations and SQL scripts for the two databases.
 
-The original delivery notes recorded a directory-path issue on the IUT hosting server and possible cookie conflicts during token refresh. Those notes remained in the [submission README](submission/README.md).
+The [delivery notes](submission/README.md) cover local startup, a directory-path issue on the IUT hosting server and cookie conflicts during token refresh.
 
-## Team and history
+## Team
 
 - **[Marius Brouty](https://github.com/Marius-brt)**
 - **[Clément Garro](https://github.com/Clement-Garro)**
 - **[Daniil Hirchyts](https://github.com/Daniil-Hirchyts)**
 
-The original histories recorded work from September to December 2024. Branch references and the selected snapshots were recorded in [history/original-refs.json](history/original-refs.json), with original authorship and commit objects retained.
-
 ## Licensing
 
-The existing package declarations were retained: the Symfony applications declared `proprietary`, and the directory's asset package declared `UNLICENSED`. The declarations and their source files were recorded in [LICENSES.md](LICENSES.md). Third-party components retained their original notices.
+The Symfony applications declare `proprietary`, and the directory's asset package declares `UNLICENSED`. See [LICENSES.md](LICENSES.md) for the component declarations. Third-party components have their own license notices.

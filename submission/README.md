@@ -1,9 +1,8 @@
-# README
+# H-API Trail — livraison Docker
 
 ## Dépôt Git
 
-Le code source des projets est hébergé sur GitHub :  
-[https://github.com/3Guys1Project/Rendu](https://github.com/3Guys1Project/Rendu)
+Cette application réunit le client Vue, l’API d’événements et l’annuaire. Voir la [présentation du projet](../README.md).
 
 ## Récapitulatif de l'investissement des membres
 
@@ -11,7 +10,7 @@ Le code source des projets est hébergé sur GitHub :
 - **Daniil** : Front (70%), API (30%)
 - **Clément** : Front (30%), API (60%), Deploiement (10%)
 
-## URL des projets déployés
+## Adresses de déploiement utilisées en 2024
 
 - **Annuaire** : [https://webinfo.iutmontp.univ-montp2.fr/~garroc/annuaire/public](https://webinfo.iutmontp.univ-montp2.fr/~garroc/annuaire/public)
 - **Front** : [https://webinfo.iutmontp.univ-montp2.fr/~garroc/front](https://webinfo.iutmontp.univ-montp2.fr/~garroc/front)
@@ -51,19 +50,18 @@ Pour lancer et tester l'application en local, voici les étapes spécifiques à 
 
 1. Clonez le dépôt Git :
    ```bash
-   git clone https://github.com/3Guys1Project/Rendu
-   cd Rendu
+   git clone https://github.com/Daniil-Hirchyts/H-API-Trail.git
+   cd H-API-Trail/submission
     ```
 2. Exécutez le script run.sh situé à la racine du projet pour démarrer les services nécessaires :
     ```bash
     ./run.sh
     ```
-> **Note** : Le lancement des services peut prendre un certain temps car les entrypoints vont installer les dépendances nécessaires.
+> **Note** : Le lancement des services peut prendre un certain temps car les entrypoints installent les dépendances. Le script `run.sh` tente aussi de copier des fichiers d’environnement vers un dossier `app/` absent de cette arborescence ; les fichiers d’environnement des applications se trouvent dans leurs propres dossiers sous `shared/`.
    
 ## Peuplement de la base de données
 
-La base de données sur le server de l'IUT est déjà peuplée. 
-Pour peupler la base de données en local, vous pouvez executer les scripts SQL qui sont à la racine du projet.
+Les scripts [script_sql_annuaire.sql](script_sql_annuaire.sql) et [script_sql_api.sql](script_sql_api.sql) fournissent les données à importer dans les bases locales correspondantes.
 
 ## API
 

@@ -2,8 +2,7 @@
 
 ## Dépôt Git
 
-Le code source complet du projet est disponible sur GitHub :
-[3Guys1Project/apiTrail](https://github.com/3Guys1Project/apiTrail)
+Le code de l’API se trouve dans [shared/public_html/apiTrail](shared/public_html/apiTrail/). La [présentation du projet](../README.md) décrit les autres applications.
 
 ## Endpoints de l'API
 
@@ -55,7 +54,7 @@ Ci-dessous, vous trouverez une liste des routes disponibles dans l'API. Elle pre
 - **Récupérer les participations d'un utilisateurs**
     - `GET /api/utilisateurs/{idUser}/participations`
 - **Supprimer une participation spécifique d'un utilisateur**
-    - `DELETE /api/utilisateurs/{idUser}/participations/{idParticipation}`
+    - `DELETE /api/participations/{id}`
 - **Récupérer les participations d'un événement**
     - `GET /api/events/{idEvent}/participations`
 
@@ -73,6 +72,8 @@ Assurez-vous d'avoir installé Docker et Docker Compose sur votre machine.
 
 ### Instructions de Lancement
 
+> Le script `run.sh` copie les fichiers d’environnement vers `./app/`, alors que le code se trouve dans `shared/public_html/apiTrail/`. L’entrypoint utilise également `apitrail` en minuscules au lieu de `apiTrail`. Ces chemins doivent correspondre au dossier de l’application pour lancer les services correctement.
+
 1. **Choix de l'environnement** :
     - **Développement** : Ce mode utilise des volumes partagés pour un développement interactif.
     - **Production** : Ce mode configure l’API pour un environnement de production avec des variables d'environnement adaptées.
@@ -88,13 +89,16 @@ Assurez-vous d'avoir installé Docker et Docker Compose sur votre machine.
       ```bash
       ./run.sh prod
       ```
-      Ce mode utilise à la fois `compose.yaml` et `compose.prod.yaml` pour une configuration adaptée en production, sans volumes partagés et avec les ports standards.
+      Ce mode combine `compose.yaml` et `compose.prod.yaml` et définit `APP_ENV=prod`. Les montages de volumes du fichier de base restent actifs ; cette configuration ne constitue pas une image autonome de production.
 
 3. **Configuration des JWT** :
    Pour que l'authentification avec JWT fonctionne correctement, exécutez la commande suivante pour générer les clés de chiffrement JWT :
    ```bash
    php bin/console lexik:jwt:generate-keypair
-   
+   ```
+
+   Cette commande s’exécute dans le conteneur, depuis `/var/www/html/apiTrail`.
+
 4. **Accès à l'API** :
     - En mode **développement** : Accès à `http://localhost:80` (ou port spécifié).
     - En mode **production** : Accès à `https://localhost:443` avec un certificat SSL auto-signé.
@@ -102,7 +106,7 @@ Assurez-vous d'avoir installé Docker et Docker Compose sur votre machine.
 
 ## Répartition des contributions
 
-Chaque membre a contribué de manière équitable au développement du projet :
+Les contributions couvraient les domaines suivants :
 
 - **Clément Garro** - Implémentation des routes d’utilisateur et d’authentification. Développement de la gestion des 
   événements et des participations.
